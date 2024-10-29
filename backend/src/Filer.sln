@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{B3E0F9B5-72D2-42CB-8E22-1BF0424CEC86}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Filer.Common.Domain", "Common\Filer.Common.Domain\Filer.Common.Domain.csproj", "{E4474A2C-B668-48BD-A0FC-2BAA48B758C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Filer.Common.Application", "Common\Filer.Common.Application\Filer.Common.Application.csproj", "{415F7A56-2659-4852-9B19-A396AEF73DEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Filer.Common.Infrastructure", "Common\Filer.Common.Infrastructure\Filer.Common.Infrastructure.csproj", "{BE69A752-ACF4-4839-A7BB-D0A68FAE5F31}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Filer.Common.Presentation", "Common\Filer.Common.Presentation\Filer.Common.Presentation.csproj", "{BFCE182F-6CAB-4578-897F-7D6127C9D8CF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microservices", "Microservices", "{CF337B82-7F47-4A2F-970B-58C59B121774}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Filer.TelegramBot.Presentation", "Microservices\TelegramBot\Filer.TelegramBot.Presentation\Filer.TelegramBot.Presentation.csproj", "{3693051D-6C31-45DB-85AA-85BC2D4E1FB5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TelegramBot", "TelegramBot", "{69B5241F-82EB-418F-BA04-318F4C258BE3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E4474A2C-B668-48BD-A0FC-2BAA48B758C0} = {B3E0F9B5-72D2-42CB-8E22-1BF0424CEC86}
+		{415F7A56-2659-4852-9B19-A396AEF73DEC} = {B3E0F9B5-72D2-42CB-8E22-1BF0424CEC86}
+		{BE69A752-ACF4-4839-A7BB-D0A68FAE5F31} = {B3E0F9B5-72D2-42CB-8E22-1BF0424CEC86}
+		{BFCE182F-6CAB-4578-897F-7D6127C9D8CF} = {B3E0F9B5-72D2-42CB-8E22-1BF0424CEC86}
+		{69B5241F-82EB-418F-BA04-318F4C258BE3} = {CF337B82-7F47-4A2F-970B-58C59B121774}
+		{3693051D-6C31-45DB-85AA-85BC2D4E1FB5} = {69B5241F-82EB-418F-BA04-318F4C258BE3}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E4474A2C-B668-48BD-A0FC-2BAA48B758C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4474A2C-B668-48BD-A0FC-2BAA48B758C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4474A2C-B668-48BD-A0FC-2BAA48B758C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4474A2C-B668-48BD-A0FC-2BAA48B758C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{415F7A56-2659-4852-9B19-A396AEF73DEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{415F7A56-2659-4852-9B19-A396AEF73DEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{415F7A56-2659-4852-9B19-A396AEF73DEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{415F7A56-2659-4852-9B19-A396AEF73DEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE69A752-ACF4-4839-A7BB-D0A68FAE5F31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE69A752-ACF4-4839-A7BB-D0A68FAE5F31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE69A752-ACF4-4839-A7BB-D0A68FAE5F31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE69A752-ACF4-4839-A7BB-D0A68FAE5F31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFCE182F-6CAB-4578-897F-7D6127C9D8CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFCE182F-6CAB-4578-897F-7D6127C9D8CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFCE182F-6CAB-4578-897F-7D6127C9D8CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFCE182F-6CAB-4578-897F-7D6127C9D8CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3693051D-6C31-45DB-85AA-85BC2D4E1FB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3693051D-6C31-45DB-85AA-85BC2D4E1FB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3693051D-6C31-45DB-85AA-85BC2D4E1FB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3693051D-6C31-45DB-85AA-85BC2D4E1FB5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
