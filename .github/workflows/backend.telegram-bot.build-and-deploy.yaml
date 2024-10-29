@@ -92,8 +92,8 @@ jobs:
           proxy_password: ${{ secrets.PROXY_SSH_PASSWORD }}
           proxy_port: ${{ secrets.PROXY_SSH_PORT }}
           script: |
-            sudo microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot/secret.yaml
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot/secret.yaml
 
-            sudo microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot/deployment.yaml
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot/deployment.yaml
 
-            sudo microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot/service.yaml
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot/service.yaml
