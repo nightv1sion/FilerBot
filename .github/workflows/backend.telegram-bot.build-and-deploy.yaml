@@ -22,7 +22,7 @@ jobs:
           username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
           password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
 
-      - name: "Build & Publish Blazor Web App Image"
+      - name: "Publish Telegram Bot Image"
         uses: docker/build-push-action@v4
         with:
           context: ./backend/src
@@ -40,6 +40,21 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
 
+      - name: "SSH Proxy whoami test"
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          proxy_host: ${{ secrets.PROXY_SSH_HOST }}
+          proxy_username: ${{ secrets.PROXY_SSH_USERNAME }}
+          proxy_password: ${{ secrets.PROXY_SSH_PASSWORD }}
+          proxy_port: ${{ secrets.PROXY_SSH_PORT }}
+          script: |
+            whoami
+            ls -al
+
       - name: "Copy Kubernetes files to server"
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -51,7 +66,7 @@ jobs:
           proxy_username: ${{ secrets.PROXY_SSH_USERNAME }}
           proxy_password: ${{ secrets.PROXY_SSH_PASSWORD }}
           proxy_port: ${{ secrets.PROXY_SSH_PORT }}
-          source: backend/kubernetes/TelegramBot/*
+          source: backend/infra/kubernetes/TelegramBot/*
           target: /github/kubernetes/TelegramBot
 
       - name: "Apply Kubernetes files"
