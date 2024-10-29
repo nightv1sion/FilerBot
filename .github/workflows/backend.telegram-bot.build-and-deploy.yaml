@@ -78,7 +78,7 @@ jobs:
           proxy_password: ${{ secrets.PROXY_SSH_PASSWORD }}
           proxy_port: ${{ secrets.PROXY_SSH_PORT }}
           source: backend/infra/kubernetes/TelegramBot/*
-          target: /github/kubernetes/TelegramBot
+          target: /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot
 
       - name: "Apply Kubernetes files"
         uses: appleboy/ssh-action@v1.0.0
@@ -92,8 +92,8 @@ jobs:
           proxy_password: ${{ secrets.PROXY_SSH_PASSWORD }}
           proxy_port: ${{ secrets.PROXY_SSH_PORT }}
           script: |
-            kubectl apply -f /github/kubernetes/TelegramBot/secret.yaml
+            kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot/secret.yaml
 
-            kubectl apply -f /github/kubernetes/TelegramBot/deployment.yaml
+            kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot/deployment.yaml
 
-            kubectl apply -f /github/kubernetes/TelegramBot/service.yaml
+            kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot/service.yaml
