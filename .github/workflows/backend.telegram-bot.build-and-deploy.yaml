@@ -22,7 +22,7 @@ jobs:
           username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
           password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
 
-      - name: "Build & Publish Blazor Web App Image"
+      - name: "Publish Telegram Bot Image"
         uses: docker/build-push-action@v4
         with:
           context: ./backend/src
@@ -51,7 +51,7 @@ jobs:
           proxy_username: ${{ secrets.PROXY_SSH_USERNAME }}
           proxy_password: ${{ secrets.PROXY_SSH_PASSWORD }}
           proxy_port: ${{ secrets.PROXY_SSH_PORT }}
-          source: backend/kubernetes/TelegramBot/*
+          source: backend/infra/kubernetes/TelegramBot/*
           target: /github/kubernetes/TelegramBot
 
       - name: "Apply Kubernetes files"
