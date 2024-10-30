@@ -5,6 +5,7 @@ on:
     paths:
       [
         "backend/src/Microservices/TelegramBot/**",
+        "backend/infra/kubernetes/TelegramBot/**",
         ".github/workflows/backend.telegram-bot.build-and-deploy.yaml",
       ]
   workflow_dispatch:
