@@ -25,7 +25,7 @@ spec:
             - secretRef:
                 name: telegram-bot-secrets
       strategy:
-      type: RollingUpdate
-      rollingUpdate:
-        maxUnavailable: 1
-        maxSurge: 1
+        type: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 1
+          maxSurge: 1
