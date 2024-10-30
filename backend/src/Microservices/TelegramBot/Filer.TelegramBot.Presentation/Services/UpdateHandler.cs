@@ -38,7 +38,8 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
 
         Message sentMessage = await (messageText.Split(' ')[0] switch
         {
-            _ => AnswerToStartMessage(msg)
+            "/start" => AnswerToStartMessage(msg),
+            _ => AnswerToUnknownMessage(msg)
         });
         logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
     }
@@ -53,6 +54,17 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
             parseMode: ParseMode.Html,
             replyMarkup: new ReplyKeyboardRemove());
 
+    }
+
+    private async Task<Message> AnswerToUnknownMessage(Message msg)
+    {
+        const string answer = "Не понимаю о чём речь.";
+
+        return await bot.SendTextMessageAsync(
+            msg.Chat,
+            answer,
+            parseMode: ParseMode.Html,
+            replyMarkup: new ReplyKeyboardRemove());
     }
     
     private Task UnknownUpdateHandlerAsync(Update update)
