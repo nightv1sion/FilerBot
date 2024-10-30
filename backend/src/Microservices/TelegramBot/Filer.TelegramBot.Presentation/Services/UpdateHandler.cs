@@ -39,6 +39,7 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
         Message sentMessage = await (messageText.Split(' ')[0] switch
         {
             "/start" => AnswerToStartMessage(msg),
+            "/exit" => bot.SendTextMessageAsync(msg.Chat, "Bye!"),
             _ => AnswerToUnknownMessage(msg)
         });
         logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
