@@ -87,3 +87,5 @@ jobs:
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot/service.yaml
 
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl set image -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot/deployment.yaml telegram-bot=${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_REGISTRY_USERNAME }}/filer-telegram-bot:latest
+
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl delete pods -l app=telegram-bot --namespace filer
