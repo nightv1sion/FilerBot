@@ -40,6 +40,17 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
 
+      - name: Prepare Kubernetes secrets.yaml
+        run: |
+          FILE_CONTENT=$(cat backend/infra/kubernetes/TelegramBot/secrets.yaml)
+
+          for SECRET_NAME in ${{ toJson(secrets) }}; do
+            SECRET_VALUE=${{ secrets[SECRET_NAME] }}
+            FILE_CONTENT=${FILE_CONTENT//$\{$SECRET_NAME\}/$SECRET_VALUE}
+          done
+
+          echo "$FILE_CONTENT" > secrets.yaml
+
       - name: "Copy Kubernetes files to server"
         uses: appleboy/scp-action@v0.1.7
         with:

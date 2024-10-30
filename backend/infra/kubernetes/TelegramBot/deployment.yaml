@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: telegram-bot-instance
+  name: telegram-bot
   namespace: filer
   labels:
     app: telegram-bot
@@ -16,7 +16,7 @@ spec:
         app: telegram-bot
     spec:
       containers:
-        - name: telegram-bot-instance
+        - name: telegram-bot
           image: docker.io/nightv1sion/filer-telegram-bot:latest
           imagePullPolicy: Always
           ports:
