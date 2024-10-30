@@ -2,7 +2,11 @@ name: "Deploy Telegram Bot"
 on:
   push:
     branches: ["master"]
-    paths: ["backend/infra/kubernetes/TelegramBot/**"]
+    paths:
+      [
+        "backend/infra/kubernetes/TelegramBot/**",
+        ".github/workflows/backend.telegram-bot.deploy.yaml",
+      ]
   workflow_dispatch:
 
 jobs:
@@ -13,13 +17,13 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
 
-      - name: Prepare Kubernetes secrets.yaml
+      - name: Prepare Kubernetes secret.yaml
         env:
           TELEGRAM_BOT_TOKEN_BASE64: ${{secrets.TELEGRAM_BOT_TOKEN_BASE64}}
         run: |
-          FILE_CONTENT=$(cat backend/infra/kubernetes/TelegramBot/secrets.yaml)
+          FILE_CONTENT=$(cat backend/infra/kubernetes/TelegramBot/secret.yaml)
           FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${TELEGRAM_BOT_TOKEN_BASE64}/$TELEGRAM_BOT_TOKEN_BASE64/g")
-          echo "$FILE_CONTENT" > backend/infra/kubernetes/TelegramBot/secrets.yaml
+          echo "$FILE_CONTENT" > backend/infra/kubernetes/TelegramBot/secret.yaml
 
       - name: "Copy Kubernetes files to server"
         uses: appleboy/scp-action@v0.1.7
