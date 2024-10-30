@@ -40,32 +40,6 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
 
-      - name: "SSH whoami test"
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.PROXY_SSH_HOST }}
-          username: ${{ secrets.PROXY_SSH_USERNAME }}
-          password: ${{ secrets.PROXY_SSH_PASSWORD }}
-          port: ${{ secrets.PROXY_SSH_PORT }}
-          script: |
-            whoami
-            ls -al
-
-      - name: "SSH Proxy whoami test"
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          port: ${{ secrets.SSH_PORT }}
-          proxy_host: ${{ secrets.PROXY_SSH_HOST }}
-          proxy_username: ${{ secrets.PROXY_SSH_USERNAME }}
-          proxy_password: ${{ secrets.PROXY_SSH_PASSWORD }}
-          proxy_port: ${{ secrets.PROXY_SSH_PORT }}
-          script: |
-            whoami
-            ls -al
-
       - name: "Copy Kubernetes files to server"
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -79,7 +53,7 @@ jobs:
           proxy_port: ${{ secrets.PROXY_SSH_PORT }}
           source: "backend/infra/kubernetes/TelegramBot/"
           target: /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot
-          strip_components: 1
+          strip_components: 4
 
       - name: "Apply Kubernetes files"
         uses: appleboy/ssh-action@v1.0.0
