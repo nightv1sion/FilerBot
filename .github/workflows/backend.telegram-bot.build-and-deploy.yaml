@@ -27,12 +27,15 @@ jobs:
           username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
           password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
 
-      - name: Update Image Version
+      - name: Update Image Version Variable
         run: |
-          curl -X PUT -H "Authorization: token ${{ secrets.PAT }}" \
-          -H "Accept: application/vnd.github.v3+json" \
-          https://api.github.com/repos/${{ github.repository }}/actions/secrets/DEV_PATCH_VERSION \
-          -d "{\"encrypted_value\":\"$((${{ secrets.DEV_PATCH_VERSION }}+1))\",\"key_id\":\"${{ secrets.REPOSITORY_SECRETS_VERSION_INCREMENTOR }}\"}"
+          curl -L \
+            -X PATCH \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.REPOSITORY_SECRETS_VERSION_INCREMENTOR }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/${{ github.repository }}/actions/variables/DEV_PATCH_VERSION \
+            -d '{"name":"nightv1sion","value":""$((${{ vars.DEV_PATCH_VERSION }}+1))"}'
 
       - name: "Publish Image"
         uses: docker/build-push-action@v4
@@ -41,7 +44,7 @@ jobs:
           file: ./backend/src/Microservices/TelegramBot/Filer.TelegramBot.Presentation/Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_REGISTRY_USERNAME }}/filer-telegram-bot:dev-${{ secrets.DEV_MAJOR_VERSION }}.${{ secrets.DEV_MINOR_VERSION }}.${{ secrets.DEV_PATCH_VERSION }}
+            ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_REGISTRY_USERNAME }}/filer-telegram-bot:dev-${{ vars.DEV_MAJOR_VERSION }}.${{ vars.DEV_MINOR_VERSION }}.${{ vars.DEV_PATCH_VERSION }}
             ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_REGISTRY_USERNAME }}/filer-telegram-bot:dev-latest
           platforms: linux/amd64
           provenance: false
@@ -93,6 +96,6 @@ jobs:
 
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot/deployment.yaml
 
-            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl set image -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot/deployment.yaml telegram-bot=${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_REGISTRY_USERNAME }}/filer-telegram-bot:dev-${{ secrets.DEV_MAJOR_VERSION }}.${{ secrets.DEV_MINOR_VERSION }}.${{ secrets.DEV_PATCH_VERSION }}
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl set image -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot/deployment.yaml telegram-bot=${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_REGISTRY_USERNAME }}/filer-telegram-bot:dev-${{ vars.DEV_MAJOR_VERSION }}.${{ vars.DEV_MINOR_VERSION }}.${{ vars.DEV_PATCH_VERSION }}
 
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot/service.yaml
