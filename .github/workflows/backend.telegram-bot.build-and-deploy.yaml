@@ -27,13 +27,12 @@ jobs:
           username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
           password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
 
-      - name: Update Image version
-        uses: hmanzur/actions-set-secret@v2.0.0
-        with:
-          name: "DEV_PATCH_VERSION"
-          value: $((${{ secrets.DEV_PATCH_VERSION }}+1))
-          repository: nightv1sion/FilerBot
-          token: ${{ secrets.REPOSITORY_SECRETS_VERSION_INCREMENTOR }}
+      - name: Update Image Version
+        run: |
+          curl -X PUT -H "Authorization: token ${{ secrets.PAT }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/${{ github.repository }}/actions/secrets/DEV_PATCH_VERSION \
+          -d "{\"encrypted_value\":\"$((${{ secrets.DEV_PATCH_VERSION }}+1))\",\"key_id\":\"${{ secrets.REPOSITORY_SECRETS_VERSION_INCREMENTOR }}\"}"
 
       - name: "Publish Image"
         uses: docker/build-push-action@v4
