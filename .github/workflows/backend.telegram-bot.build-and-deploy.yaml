@@ -27,10 +27,14 @@ jobs:
           username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
           password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
 
-      - name: Update Image Version Variable
+      - name: Calculate Image Version
         env:
           OLD_PATCH_VERSION: ${{ vars.DEV_PATCH_VERSION }}
-          NEW_PATCH_VERSION: $(( env.OLD_PATCH_VERSION + 1))
+        run: |
+          echo "NEW_PATCH_VERSION=$(($OLD_PATCH_VERSION + 1))"
+
+      - name: Update Image Version Variable
+        env:
         run: |
           curl -L \
             -X PATCH \
