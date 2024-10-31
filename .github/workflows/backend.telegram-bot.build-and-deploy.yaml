@@ -34,7 +34,6 @@ jobs:
           echo "NEW_PATCH_VERSION=$(($OLD_PATCH_VERSION + 1))"
 
       - name: Update Image Version Variable
-        env:
         run: |
           curl -L \
             -X PATCH \
