@@ -40,6 +40,7 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
         {
             "/start" => AnswerToStartMessage(msg),
             "/test" => bot.SendTextMessageAsync(msg.Chat, "Test command is working!"),
+            "/test2" => bot.SendTextMessageAsync(msg.Chat, "Test 2 command is working!"),
             "/exit" => bot.SendTextMessageAsync(msg.Chat, "Bye!"),
             _ => AnswerToUnknownMessage(msg)
         });
