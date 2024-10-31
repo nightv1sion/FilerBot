@@ -27,16 +27,16 @@ jobs:
           username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
           password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
       
-    - name: Push to DockerHub
-        run: docker push eriksongm/master-report:${{ secrets.MAJOR }}.${{ secrets.MINOR }}
+      - name: Push to DockerHub
+          run: docker push eriksongm/master-report:${{ secrets.MAJOR }}.${{ secrets.MINOR }}
       
-    - name: Update Minor version
-        uses: hmanzur/actions-set-secret@v2.0.0
-        with:
-          name: 'DEV_PATCH_VERSION'
-          value: $((${{ secrets.DEV_PATCH_VERSION }}+1))
-          repository: EriksonGM/MasterReport
-          token: ${{ secrets.REPOSITORY_SECRETS_VERSION_INCREMENTOR }}
+      - name: Update Minor version
+          uses: hmanzur/actions-set-secret@v2.0.0
+          with:
+            name: 'DEV_PATCH_VERSION'
+            value: $((${{ secrets.DEV_PATCH_VERSION }}+1))
+            repository: EriksonGM/MasterReport
+            token: ${{ secrets.REPOSITORY_SECRETS_VERSION_INCREMENTOR }}
 
       - name: "Publish Telegram Bot Image"
         uses: docker/build-push-action@v4
