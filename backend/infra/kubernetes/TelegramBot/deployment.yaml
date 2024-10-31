@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: telegram-bot
-          image: docker.io/nightv1sion/filer-telegram-bot:latest
+          image: docker.io/nightv1sion/filer-telegram-bot:dev-latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
