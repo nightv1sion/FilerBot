@@ -35,7 +35,7 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.REPOSITORY_SECRETS_VERSION_INCREMENTOR }}" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             https://api.github.com/repos/nightv1sion/FilerBot/actions/variables/DEV_PATCH_VERSION \
-            -d '{"name":"nightv1sion","value":"$((${{ vars.DEV_PATCH_VERSION }}+1))"}'
+            -d '{"name":"DEV_PATCH_VERSION","value":"$((vars.DEV_PATCH_VERSION+1))"}'
 
       - name: "Publish Image"
         uses: docker/build-push-action@v4
