@@ -14,11 +14,11 @@ jobs:
 
       - name: Prepare Kubernetes secret.yaml
         env:
-          MINIO_ACCESS_KEY: ${{secrets.MINIO_ACCESS_KEY}}
-          MINIO_SECRET_KEY: ${{secrets.MINIO_SECRET_KEY}}
+          MINIO_ROOT_USER: ${{secrets.MINIO_ROOT_USER}}
+          MINIO_ROOT_PASSWORD: ${{secrets.MINIO_ROOT_PASSWORD}}
         run: |
           FILE_CONTENT=$(cat infra/minio/kubernetes/secret.yaml)
-          FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${MINIO_ACCESS_KEY}/$MINIO_ACCESS_KEY/g" | sed "s/\${MINIO_SECRET_KEY}/$MINIO_SECRET_KEY/g")
+          FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${MINIO_ROOT_USER}/$MINIO_ROOT_USER/g" | sed "s/\${MINIO_ROOT_PASSWORD}/$MINIO_ROOT_PASSWORD/g")
           echo "$FILE_CONTENT" > infra/minio/kubernetes/secret.yaml
 
       - name: "Copy Kubernetes files to server"
