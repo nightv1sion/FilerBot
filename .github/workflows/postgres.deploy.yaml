@@ -15,11 +15,11 @@ jobs:
 
       - name: Prepare Kubernetes secret.yaml
         env:
-          POSTGRES_USERNAME: ${{secrets.POSTGRES_USERNAME}}
+          POSTGRES_USER: ${{secrets.POSTGRES_USER}}
           POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
         run: |
           FILE_CONTENT=$(cat infra/postgres/kubernetes/secret.yaml)
-          FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${POSTGRES_USERNAME}/$POSTGRES_USERNAME/g" | sed "s/\${POSTGRES_PASSWORD}/$POSTGRES_PASSWORD/g")
+          FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${POSTGRES_USER}/$POSTGRES_USER/g" | sed "s/\${POSTGRES_PASSWORD}/$POSTGRES_PASSWORD/g")
           echo "$FILE_CONTENT" > infra/postgres/kubernetes/secret.yaml
 
       - name: "Copy Kubernetes files to server"
