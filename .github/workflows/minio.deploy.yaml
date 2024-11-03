@@ -1,0 +1,58 @@
+name: "Build and Deploy Telegram Bot"
+on:
+  push:
+    branches: ["master"]
+    paths: ["infra/minio/kubernetes/**", ".github/workflows/minio.deploy.yaml"]
+  workflow_dispatch:
+jobs:
+  deploy:
+    name: "Deploy Minio"
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare Kubernetes secret.yaml
+        env:
+          MINIO_ACCESS_KEY: ${{secrets.MINIO_ACCESS_KEY}}
+          MINIO_SECRET_KEY: ${{secrets.MINIO_SECRET_KEY}}
+        run: |
+          FILE_CONTENT=$(cat infra/minio/kubernetes/secret.yaml)
+          FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${MINIO_ACCESS_KEY}/$MINIO_ACCESS_KEY/g" | sed "s/\${MINIO_SECRET_KEY}/$MINIO_SECRET_KEY/g")
+          echo "$FILE_CONTENT" > infra/minio/kubernetes/secret.yaml
+
+      - name: "Copy Kubernetes files to server"
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          proxy_host: ${{ secrets.PROXY_SSH_HOST }}
+          proxy_username: ${{ secrets.PROXY_SSH_USERNAME }}
+          proxy_password: ${{ secrets.PROXY_SSH_PASSWORD }}
+          proxy_port: ${{ secrets.PROXY_SSH_PORT }}
+          source: "infra/minio/kubernetes/"
+          target: /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/minio
+          strip_components: 4
+
+      - name: "Apply Kubernetes files"
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          proxy_host: ${{ secrets.PROXY_SSH_HOST }}
+          proxy_username: ${{ secrets.PROXY_SSH_USERNAME }}
+          proxy_password: ${{ secrets.PROXY_SSH_PASSWORD }}
+          proxy_port: ${{ secrets.PROXY_SSH_PORT }}
+          script: |
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/minio/secret.yaml
+
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/minio/deployment.yaml
+
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/minio/service.yaml
+
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S rm -rf /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/minio

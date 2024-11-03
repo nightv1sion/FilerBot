@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: filer
+  labels:
+    app: minio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: minio-pvc
+      containers:
+        - name: minio
+          image: quay.io/minio/minio:latest
+          imagePullPolicy: Always
+          command:
+            - /bin/bash
+            - -c
+          args:
+            - minio server /minio-data --console-address :9090
+          volumeMounts:
+            - name: storage
+              mountPath: "/storage"
+          ports:
+            - containerPort: 9000
+              hostPort: 9000
+          envFrom:
+            - secretRef:
+                name: minio-secrets
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
