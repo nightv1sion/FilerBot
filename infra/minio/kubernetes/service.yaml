@@ -9,7 +9,7 @@ spec:
   type: LoadBalancer
   ports:
     - port: 9090
-      targetPort: 9090
+      targetPort: 90
       protocol: TCP
   selector:
     app: minio
