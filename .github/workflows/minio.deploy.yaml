@@ -1,4 +1,4 @@
-name: "Build and Deploy Telegram Bot"
+name: "Deploy Minio"
 on:
   push:
     branches: ["master"]
@@ -8,7 +8,6 @@ jobs:
   deploy:
     name: "Deploy Minio"
     runs-on: ubuntu-latest
-    needs: build
     steps:
       - name: checkout
         uses: actions/checkout@v4
