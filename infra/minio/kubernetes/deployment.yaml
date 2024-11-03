@@ -37,7 +37,7 @@ spec:
               hostPort: 9000
           envFrom:
             - secretRef:
-                name: minio-secretsс
+                name: minio-secrets
   strategy:
     type: RollingUpdate
     rollingUpdate:
