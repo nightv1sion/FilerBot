@@ -5,7 +5,7 @@ on:
     paths:
       [
         "backend/src/Microservices/TelegramBot/**",
-        "backend/infra/kubernetes/TelegramBot/**",
+        "infra/backend/TelegramBot/kubernetes/**",
         ".github/workflows/backend.telegram-bot.build-and-deploy.yaml",
       ]
   workflow_dispatch:
@@ -67,9 +67,9 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN_BASE64: ${{secrets.TELEGRAM_BOT_TOKEN_BASE64}}
         run: |
-          FILE_CONTENT=$(cat backend/infra/kubernetes/TelegramBot/secret.yaml)
+          FILE_CONTENT=$(cat infra/backend/TelegramBot/kubernetes/secret.yaml)
           FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${TELEGRAM_BOT_TOKEN_BASE64}/$TELEGRAM_BOT_TOKEN_BASE64/g")
-          echo "$FILE_CONTENT" > backend/infra/kubernetes/TelegramBot/secret.yaml
+          echo "$FILE_CONTENT" > infra/backend/TelegramBot/kubernetes/secret.yaml
 
       - name: "Copy Kubernetes files to server"
         uses: appleboy/scp-action@v0.1.7
@@ -82,7 +82,7 @@ jobs:
           proxy_username: ${{ secrets.PROXY_SSH_USERNAME }}
           proxy_password: ${{ secrets.PROXY_SSH_PASSWORD }}
           proxy_port: ${{ secrets.PROXY_SSH_PORT }}
-          source: "backend/infra/kubernetes/TelegramBot/"
+          source: "infra/backend/TelegramBot/kubernetes/"
           target: /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot
           strip_components: 4
 
@@ -105,3 +105,5 @@ jobs:
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl set image -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot/deployment.yaml telegram-bot=${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_REGISTRY_USERNAME }}/filer-telegram-bot:dev-${{ vars.DEV_MAJOR_VERSION }}.${{ vars.DEV_MINOR_VERSION }}.${{ vars.DEV_PATCH_VERSION }}
 
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot/service.yaml
+
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S rm -rf /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/TelegramBot
