@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  filer.telegram-bot:
+    image: filer.telegram-bot
+    container_name: Filer.TelegramBot
+    build:
+      context: .
+      dockerfile: Microservices/TelegramBot/Filer.TelegramBot.Presentation/Dockerfile
+    ports:
+      - 7000:8080
+      - 7001:8081
+    environment:
+      TelegramIntegration__BotConfiguration__BotToken: $TELEGRAM_BOT_TOKEN
+
+  filer.minio:
+    image: quay.io/minio/minio:latest
+    container_name: Filer.Minio
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    command: minio server /minio-data --console-address :9090
+    ports:
+      - 9000:9000
+      - 9090:9090
+    volumes:
+      - minio-data:/data
+volumes:
+  minio-data:

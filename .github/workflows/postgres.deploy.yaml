@@ -1,0 +1,62 @@
+name: "Deploy Postgres"
+on:
+  push:
+    branches: ["master"]
+    paths:
+      ["infra/postgres/kubernetes/**", ".github/workflows/postgres.deploy.yaml"]
+  workflow_dispatch:
+jobs:
+  deploy:
+    name: "Deploy Postgres"
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare Kubernetes secret.yaml
+        env:
+          POSTGRES_USERNAME: ${{secrets.POSTGRES_USERNAME}}
+          POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
+        run: |
+          FILE_CONTENT=$(cat infra/postgres/kubernetes/secret.yaml)
+          FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${POSTGRES_USERNAME}/$POSTGRES_USERNAME/g" | sed "s/\${POSTGRES_PASSWORD}/$POSTGRES_PASSWORD/g")
+          echo "$FILE_CONTENT" > infra/postgres/kubernetes/secret.yaml
+
+      - name: "Copy Kubernetes files to server"
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          proxy_host: ${{ secrets.PROXY_SSH_HOST }}
+          proxy_username: ${{ secrets.PROXY_SSH_USERNAME }}
+          proxy_password: ${{ secrets.PROXY_SSH_PASSWORD }}
+          proxy_port: ${{ secrets.PROXY_SSH_PORT }}
+          source: "infra/postgres/kubernetes/"
+          target: /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/postgres
+          strip_components: 3
+
+      - name: "Apply Kubernetes files"
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          proxy_host: ${{ secrets.PROXY_SSH_HOST }}
+          proxy_username: ${{ secrets.PROXY_SSH_USERNAME }}
+          proxy_password: ${{ secrets.PROXY_SSH_PASSWORD }}
+          proxy_port: ${{ secrets.PROXY_SSH_PORT }}
+          script: |
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/postgres/persistentVolume.yaml
+
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/postgres/persistentVolumeClaim.yaml
+
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/postgres/secret.yaml
+
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/postgres/deployment.yaml
+
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/postgres/service.yaml
+
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S rm -rf /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/minio
