@@ -1,17 +1,15 @@
-version: "3.9"
-
 services:
   filer.telegram-bot:
-    image: filer.telegram-bot
     container_name: Filer.TelegramBot
     build:
       context: .
       dockerfile: Microservices/TelegramBot/Filer.TelegramBot.Presentation/Dockerfile
     ports:
-      - 7000:8080
-      - 7001:8081
+      - "7000:8080"
     environment:
       TelegramIntegration__BotConfiguration__BotToken: $TELEGRAM_BOT_TOKEN
+    labels:
+      com.jetbrains.rider.debug: "true"
 
   filer.minio:
     image: quay.io/minio/minio:latest
@@ -25,5 +23,18 @@ services:
       - 9090:9090
     volumes:
       - minio-data:/data
+  
+  filer.postgres:
+    image: postgres:17
+    container_name: Filer.Postgres
+    environment:
+      - POSTGRES_DB=planner
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./.containers/db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
 volumes:
   minio-data:

@@ -38,6 +38,13 @@ spec:
           envFrom:
             - secretRef:
                 name: minio-secrets
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 100m
+            limits:
+              memory: 256Mi
+              cpu: 200m
   strategy:
     type: RollingUpdate
     rollingUpdate:

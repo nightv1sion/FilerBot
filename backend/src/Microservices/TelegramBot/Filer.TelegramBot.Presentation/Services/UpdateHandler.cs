@@ -30,7 +30,7 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
 
     private async Task OnMessage(Message msg)
     {
-        logger.LogInformation("Receive message type: {MessageType}", msg.Type);
+        logger.LogInformation("{UserId} Receive message type: {MessageType}", msg.Chat.Id, msg.Type);
         if (msg.Text is not { } messageText)
         {
             return;
@@ -56,7 +56,6 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
             answer,
             parseMode: ParseMode.Html,
             replyMarkup: new ReplyKeyboardRemove());
-
     }
 
     private async Task<Message> AnswerToUnknownMessage(Message msg)

@@ -13,7 +13,9 @@ public static class DependencyInjection
     {
         services.Configure<BotConfiguration>(configuration.GetSection("TelegramIntegration:BotConfiguration"));
 
-        services.AddHttpClient("telegram_bot_client").RemoveAllLoggers()
+        services
+            .AddHttpClient("telegram_bot_client")
+            .RemoveAllLoggers()
             .AddTypedClient<ITelegramBotClient>((httpClient, sp) =>
             {
                 BotConfiguration? botConfiguration = sp.GetService<IOptions<BotConfiguration>>()?.Value;
