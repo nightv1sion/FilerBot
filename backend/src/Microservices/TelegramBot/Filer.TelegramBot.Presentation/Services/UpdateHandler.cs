@@ -8,8 +8,18 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Filer.TelegramBot.Presentation.Services;
 
-public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger) : IUpdateHandler
+public sealed class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger) : IUpdateHandler
 {
+    private static class Menu
+    {
+        public const string MyFiles = "Мои файлы";
+    }
+
+    private static class CallbackData
+    {
+        public const string OpenDirectory = "open_directory";
+    }
+    
     public async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, HandleErrorSource source, CancellationToken cancellationToken)
     {
         if (exception is RequestException)
@@ -24,6 +34,7 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
         await (update switch
         {
             { Message: { } message }                        => OnMessage(message),
+            { CallbackQuery: {} callbackQuery}              => OnCallbackQuery(callbackQuery),
             _                                               => UnknownUpdateHandlerAsync(update)
         });
     }
@@ -36,12 +47,10 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
             return;
         }
 
-        Message sentMessage = await (messageText.Split(' ')[0] switch
+        Message sentMessage = await (messageText switch
         {
             "/start" => AnswerToStartMessage(msg),
-            "/test" => bot.SendTextMessageAsync(msg.Chat, "Test command is working!"),
-            "/test2" => bot.SendTextMessageAsync(msg.Chat, "Test 2 command is working!"),
-            "/exit" => bot.SendTextMessageAsync(msg.Chat, "Bye!"),
+            Menu.MyFiles => HandleMyFiles(msg),
             _ => AnswerToUnknownMessage(msg)
         });
         logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
@@ -49,13 +58,14 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
 
     private async Task<Message> AnswerToStartMessage(Message msg)
     {
-        const string answer = "Это бот для управления файлами.";
+        const string answer = "Это бот для управления файлами. Меню:";
         
         return await bot.SendTextMessageAsync(
             msg.Chat,
             answer,
             parseMode: ParseMode.Html,
-            replyMarkup: new ReplyKeyboardRemove());
+            replyMarkup: new ReplyKeyboardMarkup()
+                .AddButton("Мои файлы"));
     }
 
     private async Task<Message> AnswerToUnknownMessage(Message msg)
@@ -73,5 +83,23 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
     {
         logger.LogInformation("Unknown update type: {UpdateType}", update.Type);
         return Task.CompletedTask;
+    }
+
+    private Task<Message> HandleMyFiles(Message message)
+    {
+        var keyboard = new InlineKeyboardMarkup()
+            .AddButton("Папка 1", CallbackData.OpenDirectory)
+            .AddButton("Папка 2", CallbackData.OpenDirectory);
+
+        return bot.SendTextMessageAsync(message.Chat, "Выберите папку", replyMarkup: keyboard);
+    }
+
+    private Task OnCallbackQuery(CallbackQuery callbackQuery)
+    {
+        return callbackQuery.Data switch
+        {
+            CallbackData.OpenDirectory => HandleMyFiles(callbackQuery.Message!),
+            _ => bot.SendTextMessageAsync(callbackQuery.ChatInstance, "Не понимаю о чём речь")
+        };
     }
 }
