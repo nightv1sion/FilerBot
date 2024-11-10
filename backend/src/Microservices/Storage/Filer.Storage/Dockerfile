@@ -12,6 +12,7 @@ COPY ["Common/Filer.Common.Infrastructure/Filer.Common.Infrastructure.csproj", "
 COPY ["Common/Filer.Common.Application/Filer.Common.Application.csproj", "Common/Filer.Common.Application/"]
 COPY ["Common/Filer.Common.Domain/Filer.Common.Domain.csproj", "Common/Filer.Common.Domain/"]
 COPY ["Common/Filer.Common.Presentation/Filer.Common.Presentation.csproj", "Common/Filer.Common.Presentation/"]
+COPY ["Microservices/Storage/Filer.Storage.Integration/Filer.Storage.Integration.csproj", "Microservices/Storage/Filer.Storage.Integration/"]
 RUN dotnet restore "Microservices/Storage/Filer.Storage/Filer.Storage.csproj"
 COPY . .
 WORKDIR "/src/Microservices/Storage/Filer.Storage"
