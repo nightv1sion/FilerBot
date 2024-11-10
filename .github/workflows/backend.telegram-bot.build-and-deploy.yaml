@@ -70,9 +70,9 @@ jobs:
           TELEGRAM_BOT_POSTGRES_CONNECTION_STRING: ${{secrets.TELEGRAM_BOT_POSTGRES_CONNECTION_STRING}}
         run: |
           FILE_CONTENT=$(cat infra/backend/TelegramBot/kubernetes/secret.yaml)
-          FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${TELEGRAM_BOT_TOKEN_BASE64}/$TELEGRAM_BOT_TOKEN_BASE64/g"
-          FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${STORAGE_URI}/$STORAGE_URI/g"
-          FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${TELEGRAM_BOT_POSTGRES_CONNECTION_STRING}/$TELEGRAM_BOT_POSTGRES_CONNECTION_STRING/g"
+          FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${TELEGRAM_BOT_TOKEN_BASE64}/$TELEGRAM_BOT_TOKEN_BASE64/g")
+          FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${STORAGE_URI}/$STORAGE_URI/g")
+          FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${TELEGRAM_BOT_POSTGRES_CONNECTION_STRING}/$TELEGRAM_BOT_POSTGRES_CONNECTION_STRING/g")
           echo "$FILE_CONTENT" > infra/backend/TelegramBot/kubernetes/secret.yaml
 
       - name: "Copy Kubernetes files to server"
