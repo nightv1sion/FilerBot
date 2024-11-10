@@ -1,17 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: storage-service
+  name: storage
   namespace: filer
   labels:
     app: storage
 spec:
   selector:
     app: storage
-  type: NodePort
+  type: ClusterIP
   ports:
     - port: 80
-      nodePort: 31002
       targetPort: 8080
       protocol: TCP
       name: http
