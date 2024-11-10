@@ -32,6 +32,7 @@ public sealed class DirectoryConfiguration : IEntityTypeConfiguration<DirectoryO
             .HasOne(x => x.ParentDirectory)
             .WithMany(x => x.SubDirectories)
             .HasForeignKey(x => x.ParentDirectoryId)
+            .OnDelete(DeleteBehavior.Cascade)
             .IsRequired(false);
         
         builder

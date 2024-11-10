@@ -10,7 +10,6 @@ public sealed class GetDirectoriesEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-
         app.MapGet("directories", Create);
     }
 

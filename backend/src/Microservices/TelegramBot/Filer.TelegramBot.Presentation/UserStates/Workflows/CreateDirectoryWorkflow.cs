@@ -36,6 +36,7 @@ public sealed class CreateDirectoryWorkflow : IWorkflow
         CancellationToken cancellationToken)
     {
         var storageApi = serviceProvider.GetRequiredService<IStorageApi>();
+        var bot = serviceProvider.GetRequiredService<ITelegramBotClient>();
         
         switch (WorkflowStep)
         {
@@ -48,6 +49,11 @@ public sealed class CreateDirectoryWorkflow : IWorkflow
                         ParentDirectoryId),
                     cancellationToken);
                 IsCompleted = true;
+                        
+                await bot.SendTextMessageAsync(
+                    message.Chat.Id,
+                    "Папка создана",
+                    cancellationToken: cancellationToken);
                 break;
             
             default:

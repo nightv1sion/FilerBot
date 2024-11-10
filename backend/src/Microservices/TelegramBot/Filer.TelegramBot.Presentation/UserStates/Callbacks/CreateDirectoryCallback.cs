@@ -1,6 +1,7 @@
 using Filer.TelegramBot.Presentation.Persistence;
 using Filer.TelegramBot.Presentation.UserStates.Workflows;
 using Microsoft.EntityFrameworkCore;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace Filer.TelegramBot.Presentation.UserStates.Callbacks;
@@ -16,6 +17,7 @@ public sealed class CreateDirectoryCallback : ICallback
     {
         var dbContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
         var workflowSerializer = serviceProvider.GetRequiredService<WorkflowSerializer>();
+        var bot = serviceProvider.GetRequiredService<ITelegramBotClient>();
         
         UserState? userState = await dbContext.UserStates
             .FirstOrDefaultAsync(
@@ -44,4 +46,11 @@ public sealed class CreateDirectoryCallback : ICallback
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public static CreateDirectoryCallback Create(Guid? parentDirectoryId)
+    {
+        return new CreateDirectoryCallback
+        {
+            ParentDirectoryId = parentDirectoryId
+        };
+    }
 }

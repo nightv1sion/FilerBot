@@ -12,8 +12,7 @@ public sealed class CreateDirectoryEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("directories", Create)
-            .Accepts<CreateDirectoryRequest>(MediaTypeNames.Application.Json)
-            .AllowAnonymous();
+            .Accepts<CreateDirectoryRequest>(MediaTypeNames.Application.Json);
     }
 
     private static async Task<Ok<CreateDirectoryResponse>> Create(

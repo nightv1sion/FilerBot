@@ -8,7 +8,7 @@ namespace Filer.TelegramBot.Presentation.UserStates.Callbacks;
 
 public sealed class OpenDirectoryCallback : ICallback
 {
-    public Guid? DirectoryId { get; init; }
+    public required Guid DirectoryId { get; init; }
     
     public async Task Handle(
         IServiceProvider serviceProvider,
@@ -32,23 +32,28 @@ public sealed class OpenDirectoryCallback : ICallback
             var openDirectoryCallback = UserCallback.Create(
                 Guid.NewGuid(), 
                 callbackQuery.From.Id.ToString(), 
-                callbackSerializer.Serialize(new OpenDirectoryCallback
-                {
-                    DirectoryId = dir.Id
-                }));
+                callbackSerializer.Serialize(Create(dir.Id)));
+            
             await dbContext.UserCallbacks.AddAsync(openDirectoryCallback, cancellationToken);
+            keyboard.AddNewRow();
             keyboard.AddButton(dir.Name, openDirectoryCallback.Id.ToString());
         }
+        
+        keyboard.AddNewRow();
         
         var createDirectoryCallback = UserCallback.Create(
             Guid.NewGuid(), 
             callbackQuery.From.Id.ToString(), 
-            callbackSerializer.Serialize(new CreateDirectoryCallback
-            {
-                ParentDirectoryId = DirectoryId
-            }));
+            callbackSerializer.Serialize(CreateDirectoryCallback.Create(DirectoryId)));
         await dbContext.UserCallbacks.AddAsync(createDirectoryCallback, cancellationToken);
         keyboard.AddButton("Создать папку", createDirectoryCallback.Id.ToString());
+
+        var removeDirectoryCallback = UserCallback.Create(
+            Guid.NewGuid(), 
+            callbackQuery.From.Id.ToString(), 
+            callbackSerializer.Serialize(RemoveDirectoryCallback.Create(DirectoryId)));
+        await dbContext.UserCallbacks.AddAsync(removeDirectoryCallback, cancellationToken);
+        keyboard.AddButton("Удалить папку", removeDirectoryCallback.Id.ToString());
         
         await dbContext.SaveChangesAsync(cancellationToken);
 
@@ -57,5 +62,13 @@ public sealed class OpenDirectoryCallback : ICallback
             getDirectoriesResponse.ParentDirectory?.Path ?? "Корневая папка вашего хранилища",
             replyMarkup: keyboard,
             cancellationToken: cancellationToken);
+    }
+    
+    public static OpenDirectoryCallback Create(Guid directoryId)
+    {
+        return new OpenDirectoryCallback
+        {
+            DirectoryId = directoryId
+        };
     }
 }

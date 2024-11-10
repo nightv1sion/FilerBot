@@ -138,21 +138,22 @@ public sealed class UpdateHandler(
             var openDirectoryCallback = UserCallback.Create(
                 Guid.NewGuid(), 
                 message.Chat.Id.ToString(), 
-                callbackSerializer.Serialize(new OpenDirectoryCallback
-                {
-                    DirectoryId = dir.Id
-                }));
+                callbackSerializer.Serialize(OpenDirectoryCallback.Create(dir.Id)));
+            
             await dbContext.UserCallbacks.AddAsync(openDirectoryCallback, cancellationToken);
             
+            keyboard.AddNewRow();
             keyboard.AddButton(dir.Name, openDirectoryCallback.Id.ToString());
         }
         
         var createDirectoryCallback = UserCallback.Create(
             Guid.NewGuid(), 
             message.Chat.Id.ToString(), 
-            callbackSerializer.Serialize(new CreateDirectoryCallback()));
+            callbackSerializer.Serialize(CreateDirectoryCallback.Create(null)));
+        
         await dbContext.UserCallbacks.AddAsync(createDirectoryCallback, cancellationToken);
         
+        keyboard.AddNewRow();
         keyboard.AddButton("Создать папку", createDirectoryCallback.Id.ToString());
 
         await dbContext.SaveChangesAsync(cancellationToken);
