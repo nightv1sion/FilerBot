@@ -2,7 +2,7 @@ using Filer.TelegramBot.Presentation.Abstract;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace Filer.TelegramBot.Presentation.Services;
+namespace Filer.TelegramBot.Presentation.Telegram;
 
 internal sealed class MessageSender(ITelegramBotClient bot) : IMessageSender
 {

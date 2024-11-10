@@ -1,0 +1,109 @@
+name: "Build and Deploy Storage"
+on:
+  push:
+    branches: ["master"]
+    paths:
+      [
+        "backend/src/Microservices/Storage/**",
+        "infra/backend/Storage/kubernetes/**",
+        ".github/workflows/backend.storage.build-and-deploy.yaml",
+      ]
+  workflow_dispatch:
+jobs:
+  build:
+    name: "Build Storage"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v3
+
+      - name: "Set up Docker Buildx"
+        uses: docker/setup-buildx-action@v2
+
+      - name: "Login to GitHub Registry"
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+          password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
+
+      - name: Calculate Image Version
+        env:
+          OLD_PATCH_VERSION: ${{ vars.DEV_PATCH_VERSION }}
+        run: |
+          echo "NEW_PATCH_VERSION=$(($OLD_PATCH_VERSION + 1))" >> $GITHUB_ENV
+
+      - name: Update Image Version Variable
+        run: |
+          curl -L \
+            -X PATCH \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.REPOSITORY_SECRETS_VERSION_INCREMENTOR }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/nightv1sion/FilerBot/actions/variables/DEV_PATCH_VERSION \
+            -d '{"name":"DEV_PATCH_VERSION","value":"${{ env.NEW_PATCH_VERSION }}"}'
+
+      - name: "Publish Image"
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend/src
+          file: ./backend/src/Microservices/Storage/Filer.Storage/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_REGISTRY_USERNAME }}/filer-storage:dev-${{ vars.DEV_MAJOR_VERSION }}.${{ vars.DEV_MINOR_VERSION }}.${{ vars.DEV_PATCH_VERSION }}
+            ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_REGISTRY_USERNAME }}/filer-storage:dev-latest
+          platforms: linux/amd64
+          provenance: false
+
+  deploy:
+    name: "Deploy Storage"
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare Kubernetes secret.yaml
+        env:
+          STORAGE_POSTGRES_CONNECTION_STRING: ${{secrets.STORAGE_POSTGRES_CONNECTION_STRING}}
+        run: |
+          FILE_CONTENT=$(cat infra/backend/Storage/kubernetes/secret.yaml)
+          FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${STORAGE_POSTGRES_CONNECTION_STRING}/$STORAGE_POSTGRES_CONNECTION_STRING/g")
+          echo "$FILE_CONTENT" > infra/backend/Storage/kubernetes/secret.yaml
+
+      - name: "Copy Kubernetes files to server"
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          proxy_host: ${{ secrets.PROXY_SSH_HOST }}
+          proxy_username: ${{ secrets.PROXY_SSH_USERNAME }}
+          proxy_password: ${{ secrets.PROXY_SSH_PASSWORD }}
+          proxy_port: ${{ secrets.PROXY_SSH_PORT }}
+          source: "infra/backend/Storage/kubernetes/"
+          target: /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/Storage
+          strip_components: 4
+
+      - name: "Apply Kubernetes files"
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          proxy_host: ${{ secrets.PROXY_SSH_HOST }}
+          proxy_username: ${{ secrets.PROXY_SSH_USERNAME }}
+          proxy_password: ${{ secrets.PROXY_SSH_PASSWORD }}
+          proxy_port: ${{ secrets.PROXY_SSH_PORT }}
+          script: |
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/Storage/secret.yaml
+
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/Storage/deployment.yaml
+
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl set image -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/Storage/deployment.yaml storage=${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_REGISTRY_USERNAME }}/filer-storage:dev-${{ vars.DEV_MAJOR_VERSION }}.${{ vars.DEV_MINOR_VERSION }}.${{ vars.DEV_PATCH_VERSION }}
+
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/Storage/service.yaml
+
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S rm -rf /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/Storage

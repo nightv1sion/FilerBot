@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Filer.Storage", "Microservi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{290B8C06-2029-40D7-9C31-347DA7EBA6E0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Filer.Storage.Integration", "Microservices\Storage\Filer.Storage.Integration\Filer.Storage.Integration.csproj", "{3FA1E24D-8A05-40EF-9015-23782C7CC990}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,7 @@ Global
 		{3693051D-6C31-45DB-85AA-85BC2D4E1FB5} = {69B5241F-82EB-418F-BA04-318F4C258BE3}
 		{290B8C06-2029-40D7-9C31-347DA7EBA6E0} = {CF337B82-7F47-4A2F-970B-58C59B121774}
 		{9A9745B8-12C3-4DBB-B0B8-79123AE0C4B9} = {290B8C06-2029-40D7-9C31-347DA7EBA6E0}
+		{3FA1E24D-8A05-40EF-9015-23782C7CC990} = {290B8C06-2029-40D7-9C31-347DA7EBA6E0}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{E4474A2C-B668-48BD-A0FC-2BAA48B758C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -66,5 +69,9 @@ Global
 		{9A9745B8-12C3-4DBB-B0B8-79123AE0C4B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A9745B8-12C3-4DBB-B0B8-79123AE0C4B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A9745B8-12C3-4DBB-B0B8-79123AE0C4B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FA1E24D-8A05-40EF-9015-23782C7CC990}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FA1E24D-8A05-40EF-9015-23782C7CC990}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FA1E24D-8A05-40EF-9015-23782C7CC990}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FA1E24D-8A05-40EF-9015-23782C7CC990}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

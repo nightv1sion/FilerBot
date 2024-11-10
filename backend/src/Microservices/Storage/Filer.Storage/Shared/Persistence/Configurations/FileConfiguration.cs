@@ -23,6 +23,11 @@ public sealed class FileConfiguration : IEntityTypeConfiguration<FileObject>
             .ValueGeneratedNever();
         
         builder
+            .Property(x => x.Path)
+            .HasMaxLength(1024)
+            .ValueGeneratedNever();
+        
+        builder
             .Property(x => x.Extension)
             .HasMaxLength(256)
             .ValueGeneratedNever();
@@ -47,5 +52,11 @@ public sealed class FileConfiguration : IEntityTypeConfiguration<FileObject>
             .Property(x => x.Modified)
             .IsRequired(false)
             .ValueGeneratedNever();
+        
+        builder
+            .HasOne(x => x.ParentDirectory)
+            .WithMany(x => x.Files)
+            .HasForeignKey(x => x.ParentDirectoryId)
+            .IsRequired(false);
     }
 }

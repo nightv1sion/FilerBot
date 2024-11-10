@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Filer.Storage.Shared.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241105220416_Initial")]
+    [Migration("20241110191917_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -50,6 +50,12 @@ namespace Filer.Storage.Shared.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("parent_directory_id");
 
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)")
+                        .HasColumnName("path");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasMaxLength(128)
@@ -58,6 +64,9 @@ namespace Filer.Storage.Shared.Persistence.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_directories");
+
+                    b.HasIndex("ParentDirectoryId")
+                        .HasDatabaseName("ix_directories_parent_directory_id");
 
                     b.ToTable("directories", (string)null);
                 });
@@ -87,6 +96,16 @@ namespace Filer.Storage.Shared.Persistence.Migrations
                         .HasColumnType("character varying(256)")
                         .HasColumnName("name");
 
+                    b.Property<Guid?>("ParentDirectoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("parent_directory_id");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)")
+                        .HasColumnName("path");
+
                     b.Property<long>("Size")
                         .HasColumnType("bigint")
                         .HasColumnName("size");
@@ -100,7 +119,37 @@ namespace Filer.Storage.Shared.Persistence.Migrations
                     b.HasKey("Id")
                         .HasName("pk_files");
 
+                    b.HasIndex("ParentDirectoryId")
+                        .HasDatabaseName("ix_files_parent_directory_id");
+
                     b.ToTable("files", (string)null);
+                });
+
+            modelBuilder.Entity("Filer.Storage.Shared.Entities.DirectoryObject", b =>
+                {
+                    b.HasOne("Filer.Storage.Shared.Entities.DirectoryObject", "ParentDirectory")
+                        .WithMany("SubDirectories")
+                        .HasForeignKey("ParentDirectoryId")
+                        .HasConstraintName("fk_directories_directories_parent_directory_id");
+
+                    b.Navigation("ParentDirectory");
+                });
+
+            modelBuilder.Entity("Filer.Storage.Shared.Entities.FileObject", b =>
+                {
+                    b.HasOne("Filer.Storage.Shared.Entities.DirectoryObject", "ParentDirectory")
+                        .WithMany("Files")
+                        .HasForeignKey("ParentDirectoryId")
+                        .HasConstraintName("fk_files_directories_parent_directory_id");
+
+                    b.Navigation("ParentDirectory");
+                });
+
+            modelBuilder.Entity("Filer.Storage.Shared.Entities.DirectoryObject", b =>
+                {
+                    b.Navigation("Files");
+
+                    b.Navigation("SubDirectories");
                 });
 #pragma warning restore 612, 618
         }

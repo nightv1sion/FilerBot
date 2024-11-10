@@ -7,10 +7,14 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Microservices/Filer.Storage/Filer.Storage.csproj", "Microservices/Filer.Storage/"]
-RUN dotnet restore "Microservices/Filer.Storage/Filer.Storage.csproj"
+COPY ["Microservices/Storage/Filer.Storage/Filer.Storage.csproj", "Microservices/Storage/Filer.Storage/"]
+COPY ["Common/Filer.Common.Infrastructure/Filer.Common.Infrastructure.csproj", "Common/Filer.Common.Infrastructure/"]
+COPY ["Common/Filer.Common.Application/Filer.Common.Application.csproj", "Common/Filer.Common.Application/"]
+COPY ["Common/Filer.Common.Domain/Filer.Common.Domain.csproj", "Common/Filer.Common.Domain/"]
+COPY ["Common/Filer.Common.Presentation/Filer.Common.Presentation.csproj", "Common/Filer.Common.Presentation/"]
+RUN dotnet restore "Microservices/Storage/Filer.Storage/Filer.Storage.csproj"
 COPY . .
-WORKDIR "/src/Microservices/Filer.Storage"
+WORKDIR "/src/Microservices/Storage/Filer.Storage"
 RUN dotnet build "Filer.Storage.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish

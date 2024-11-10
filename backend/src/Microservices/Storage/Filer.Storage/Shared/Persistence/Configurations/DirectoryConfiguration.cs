@@ -18,10 +18,21 @@ public sealed class DirectoryConfiguration : IEntityTypeConfiguration<DirectoryO
             .ValueGeneratedNever();
         
         builder
+            .Property(x => x.Path)
+            .HasMaxLength(1024)
+            .ValueGeneratedNever();
+        
+        builder
             .Property(x => x.UserId)
             .IsRequired()
             .HasMaxLength(128)
             .ValueGeneratedNever();
+        
+        builder
+            .HasOne(x => x.ParentDirectory)
+            .WithMany(x => x.SubDirectories)
+            .HasForeignKey(x => x.ParentDirectoryId)
+            .IsRequired(false);
         
         builder
             .Property(x => x.CreatedAt)

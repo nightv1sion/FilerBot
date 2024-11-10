@@ -1,5 +1,6 @@
 using System.Net.Mime;
 using Filer.Common.Presentation.Endpoints;
+using Filer.Storage.Integration.Directories.CreateDirectory;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +11,6 @@ public sealed class CreateDirectoryEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-
         app.MapPost("directories", Create)
             .Accepts<CreateDirectoryRequest>(MediaTypeNames.Application.Json)
             .AllowAnonymous();
