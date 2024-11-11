@@ -15,13 +15,13 @@ public sealed class RemoveDirectoryEndpoint : IEndpoint
             .Accepts<RemoveDirectoryRequest>(MediaTypeNames.Application.Json);
     }
 
-    private static async Task<NoContent> Remove(
+    private static async Task<Ok<RemoveDirectoryResponse>> Remove(
         [FromBody] RemoveDirectoryRequest request,
         [FromServices] ISender sender,
         CancellationToken cancellationToken)
     {
         var command = new RemoveDirectoryCommand(request.UserId, request.DirectoryId);
-        await sender.Send(command, cancellationToken);
-        return TypedResults.NoContent();
+        var parentRemovedDirectoryId = await sender.Send(command, cancellationToken);
+        return TypedResults.Ok(new RemoveDirectoryResponse(parentRemovedDirectoryId));
     }
 }

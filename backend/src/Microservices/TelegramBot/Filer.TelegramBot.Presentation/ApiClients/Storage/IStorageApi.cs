@@ -19,7 +19,7 @@ public interface IStorageApi
         CancellationToken cancellationToken);
     
     [Delete("/directories")]
-    Task RemoveDirectory(
+    Task<RemoveDirectoryResponse> RemoveDirectory(
         [Body] RemoveDirectoryRequest request,
         CancellationToken cancellationToken);
 }

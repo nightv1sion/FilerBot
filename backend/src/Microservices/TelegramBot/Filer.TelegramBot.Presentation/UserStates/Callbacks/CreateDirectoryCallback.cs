@@ -17,7 +17,6 @@ public sealed class CreateDirectoryCallback : ICallback
     {
         var dbContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
         var workflowSerializer = serviceProvider.GetRequiredService<WorkflowSerializer>();
-        var bot = serviceProvider.GetRequiredService<ITelegramBotClient>();
         
         UserState? userState = await dbContext.UserStates
             .FirstOrDefaultAsync(

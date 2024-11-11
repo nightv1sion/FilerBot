@@ -26,7 +26,6 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.RegisterRefitClients(builder.Configuration);
 builder.Services.RegisterTelegramIntegration(builder.Configuration);
 builder.Services.RegisterPersistence(builder.Configuration);
-builder.Services.RegisterUserStates();
 builder.Services.RegisterCallbacks();
 builder.Services.RegisterWorkflows();
 

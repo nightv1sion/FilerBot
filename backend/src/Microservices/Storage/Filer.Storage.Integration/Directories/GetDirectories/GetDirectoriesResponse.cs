@@ -1,8 +1,8 @@
 namespace Filer.Storage.Integration.Directories.GetDirectories;
 
 public sealed record GetDirectoriesResponse(
-    GetDirectoriesResponse.DirectoryModel? ParentDirectory,
-    IReadOnlyCollection<GetDirectoriesResponse.DirectoryModel> Directories)
+    GetDirectoriesResponse.DirectoryModel? Directory,
+    IReadOnlyCollection<GetDirectoriesResponse.DirectoryModel> SubDirectories)
 {
     public sealed record DirectoryModel(
         Guid Id,

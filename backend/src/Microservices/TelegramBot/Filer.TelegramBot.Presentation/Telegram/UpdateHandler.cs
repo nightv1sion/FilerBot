@@ -1,5 +1,6 @@
 using Filer.TelegramBot.Presentation.ApiClients.Storage;
 using Filer.TelegramBot.Presentation.Persistence;
+using Filer.TelegramBot.Presentation.Telegram.Keyboard;
 using Filer.TelegramBot.Presentation.UserStates.Callbacks;
 using Filer.TelegramBot.Presentation.UserStates;
 using Filer.TelegramBot.Presentation.UserStates.Workflows;
@@ -13,13 +14,14 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Filer.TelegramBot.Presentation.Telegram;
 
-public sealed class UpdateHandler(
+internal sealed class UpdateHandler(
     ITelegramBotClient bot,
     IStorageApi storageApi,
     ApplicationDbContext dbContext,
     WorkflowSerializer workflowSerializer,
     CallbackSerializer callbackSerializer,
     IServiceProvider serviceProvider,
+    DirectoryKeyboardPresenter directoryKeyboardPresenter,
     ILogger<UpdateHandler> logger) : IUpdateHandler
 {
     private static class Menu
@@ -51,6 +53,7 @@ public sealed class UpdateHandler(
     private async Task OnMessage(Message msg, CancellationToken cancellationToken)
     {
         logger.LogInformation("{UserId} Receive message type: {MessageType}", msg.Chat.Id, msg.Type);
+        
         if (msg.Text is not { } messageText)
         {
             return;
@@ -114,7 +117,6 @@ public sealed class UpdateHandler(
 
         var currentWorkflow = workflowSerializer.Deserialize(userState.CurrentWorkflow.WorkflowPayload);
         await currentWorkflow.Continue(serviceProvider, msg, cancellationToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
         return null;
     }
     
@@ -130,38 +132,20 @@ public sealed class UpdateHandler(
             message.Chat.Id.ToString(),
             null,
             cancellationToken);
-
-        var keyboard = new InlineKeyboardMarkup();
-
-        foreach (var dir in getDirectoriesResponse.Directories)
-        {
-            var openDirectoryCallback = UserCallback.Create(
-                Guid.NewGuid(), 
-                message.Chat.Id.ToString(), 
-                callbackSerializer.Serialize(OpenDirectoryCallback.Create(dir.Id)));
-            
-            await dbContext.UserCallbacks.AddAsync(openDirectoryCallback, cancellationToken);
-            
-            keyboard.AddNewRow();
-            keyboard.AddButton(dir.Name, openDirectoryCallback.Id.ToString());
-        }
         
-        var createDirectoryCallback = UserCallback.Create(
-            Guid.NewGuid(), 
-            message.Chat.Id.ToString(), 
-            callbackSerializer.Serialize(CreateDirectoryCallback.Create(null)));
+        DirectoryKeyboardPresenter.Result result = directoryKeyboardPresenter.OpenRootDirectory(
+            getDirectoriesResponse.SubDirectories
+                .Select(x => new DirectoryKeyboardPresenter.DirectoryButton(x.Id, x.Name))
+                .ToArray(), 
+            message.Chat.Id.ToString());
         
-        await dbContext.UserCallbacks.AddAsync(createDirectoryCallback, cancellationToken);
-        
-        keyboard.AddNewRow();
-        keyboard.AddButton("Создать папку", createDirectoryCallback.Id.ToString());
-
+        await dbContext.UserCallbacks.AddRangeAsync(result.UserCallbacks, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
         
         return await bot.SendTextMessageAsync(
             message.Chat, 
             "Ваше хранилище",
-            replyMarkup: keyboard,
+            replyMarkup: result.Keyboard,
             cancellationToken: cancellationToken);
     }
 

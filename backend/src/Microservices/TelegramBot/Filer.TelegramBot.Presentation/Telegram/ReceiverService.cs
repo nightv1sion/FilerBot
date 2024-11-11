@@ -3,7 +3,7 @@ using Telegram.Bot;
 
 namespace Filer.TelegramBot.Presentation.Telegram;
 
-public sealed class ReceiverService(
+internal sealed class ReceiverService(
     ITelegramBotClient botClient,
     UpdateHandler updateHandler,
     ILogger<ReceiverServiceBase<UpdateHandler>> logger)

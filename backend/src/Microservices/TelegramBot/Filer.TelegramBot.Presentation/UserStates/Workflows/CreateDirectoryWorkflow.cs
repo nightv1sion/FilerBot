@@ -1,5 +1,7 @@
 using Filer.Storage.Integration.Directories.CreateDirectory;
 using Filer.TelegramBot.Presentation.ApiClients.Storage;
+using Filer.TelegramBot.Presentation.Persistence;
+using Filer.TelegramBot.Presentation.Telegram.Keyboard;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -37,14 +39,17 @@ public sealed class CreateDirectoryWorkflow : IWorkflow
     {
         var storageApi = serviceProvider.GetRequiredService<IStorageApi>();
         var bot = serviceProvider.GetRequiredService<ITelegramBotClient>();
+        var dbContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
+        var directoryKeyboardPresenter = serviceProvider.GetRequiredService<DirectoryKeyboardPresenter>();
+        
+        var userId = message.Chat.Id.ToString();
         
         switch (WorkflowStep)
         {
             case CreateDirectoryWorkflowStep.CreateDirectoryNameAsked:
-                
-                await storageApi.CreateDirectory(
+                CreateDirectoryResponse createDirectoryResponse = await storageApi.CreateDirectory(
                     new CreateDirectoryRequest(
-                        message.Chat.Id.ToString(),
+                        userId,
                         message.Text!,
                         ParentDirectoryId),
                     cancellationToken);
@@ -54,8 +59,32 @@ public sealed class CreateDirectoryWorkflow : IWorkflow
                     message.Chat.Id,
                     "Папка создана",
                     cancellationToken: cancellationToken);
+                
+                var getDirectoriesResponse = await storageApi.GetDirectories(
+                    userId,
+                    createDirectoryResponse.DirectoryId,
+                    cancellationToken);
+
+                DirectoryKeyboardPresenter.Result keyboardPresentResult = directoryKeyboardPresenter.OpenDirectory(
+                    getDirectoriesResponse.SubDirectories
+                        .Select(x => new DirectoryKeyboardPresenter.DirectoryButton(x.Id, x.Name))
+                        .ToArray(), 
+                    userId,
+                    createDirectoryResponse.DirectoryId,
+                    getDirectoriesResponse.Directory?.ParentDirectoryId);
+        
+                await dbContext.UserCallbacks.AddRangeAsync(keyboardPresentResult.UserCallbacks, cancellationToken);
+                await dbContext.SaveChangesAsync(cancellationToken);
+                
+                await bot.SendTextMessageAsync(
+                    userId, 
+                    getDirectoriesResponse.Directory?.Path ?? "Корневая папка вашего хранилища",
+                    replyMarkup: keyboardPresentResult.Keyboard,
+                    cancellationToken: cancellationToken);
+
                 break;
-            
+
+            case CreateDirectoryWorkflowStep.None:
             default:
                 throw new ArgumentOutOfRangeException();
         }

@@ -5,9 +5,9 @@ namespace Filer.Storage.Features.Directories.RemoveDirectory;
 
 internal sealed class RemoveDirectoryHandler(
     ApplicationDbContext dbContext)
-    : ICommandHandler<RemoveDirectoryCommand>
+    : ICommandHandler<RemoveDirectoryCommand, Guid?>
 {
-    public Task Handle(RemoveDirectoryCommand request, CancellationToken cancellationToken)
+    public async Task<Guid?> Handle(RemoveDirectoryCommand request, CancellationToken cancellationToken)
     {
         var directory = dbContext.Directories
             .Where(x => x.UserId == request.UserId)
@@ -19,6 +19,8 @@ internal sealed class RemoveDirectoryHandler(
         }
         
         dbContext.Directories.Remove(directory);
-        return dbContext.SaveChangesAsync(cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return directory.ParentDirectoryId;
     }
 }

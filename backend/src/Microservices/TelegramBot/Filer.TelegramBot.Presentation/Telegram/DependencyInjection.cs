@@ -1,19 +1,21 @@
 using Filer.TelegramBot.Presentation.Abstract;
-using Filer.TelegramBot.Presentation.Telegram;
+using Filer.TelegramBot.Presentation.Telegram.Keyboard;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
 
-namespace Filer.TelegramBot.Presentation;
+namespace Filer.TelegramBot.Presentation.Telegram;
 
-public static class TelegramIntegrationModule
+public static class DependencyInjection
 {
-    public static IServiceCollection AddTelegramIntegrationModule(
+    public static IServiceCollection RegisterTelegramIntegration(
         this IServiceCollection services,
         IConfiguration configuration)
     {
         services.Configure<BotConfiguration>(configuration.GetSection("TelegramIntegration:BotConfiguration"));
 
-        services.AddHttpClient("telegram_bot_client").RemoveAllLoggers()
+        services
+            .AddHttpClient("telegram_bot_client")
+            .RemoveAllLoggers()
             .AddTypedClient<ITelegramBotClient>((httpClient, sp) =>
             {
                 BotConfiguration? botConfiguration = sp.GetService<IOptions<BotConfiguration>>()?.Value;
@@ -26,6 +28,8 @@ public static class TelegramIntegrationModule
         services.AddScoped<ReceiverService>();
         services.AddHostedService<PollingService>();
         services.AddScoped<IMessageSender, MessageSender>();
+        services.AddScoped<DirectoryKeyboardPresenter>();
+        
         return services;
     }
 }
