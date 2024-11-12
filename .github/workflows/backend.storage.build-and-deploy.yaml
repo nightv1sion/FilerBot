@@ -66,9 +66,15 @@ jobs:
       - name: Prepare Kubernetes secret.yaml
         env:
           STORAGE_POSTGRES_CONNECTION_STRING: ${{secrets.STORAGE_POSTGRES_CONNECTION_STRING}}
+          MINIO_ENDPOINT: ${{secrets.MINIO_ENDPOINT}}
+          MINIO_ROOT_USER: ${{secrets.MINIO_ROOT_USER}}
+          MINIO_ROOT_PASSWORD: ${{secrets.MINIO_ROOT_PASSWORD}}
         run: |
           FILE_CONTENT=$(cat infra/backend/Storage/kubernetes/secret.yaml)
           FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${STORAGE_POSTGRES_CONNECTION_STRING}/$STORAGE_POSTGRES_CONNECTION_STRING/g")
+          FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${MINIO_ENDPOINT}/$MINIO_ENDPOINT/g")
+          FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${MINIO_ROOT_USER}/$MINIO_ROOT_USER/g")
+          FILE_CONTENT=$(echo "$FILE_CONTENT" | sed "s/\${MINIO_ROOT_PASSWORD}/$MINIO_ROOT_PASSWORD/g")
           echo "$FILE_CONTENT" > infra/backend/Storage/kubernetes/secret.yaml
 
       - name: "Copy Kubernetes files to server"

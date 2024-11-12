@@ -6,34 +6,37 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Filer.Storage.Features.Directories.GetDirectories;
 
-public sealed class GetDirectoriesEndpoint : IEndpoint
+public sealed class GetDirectoryEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("directories", Create);
     }
 
-    private static async Task<Ok<GetDirectoriesResponse>> Create(
+    private static async Task<Ok<GetDirectoryResponse>> Create(
         [FromQuery] string userId,
         [FromQuery] Guid? parentDirectoryId,
         [FromServices] ISender sender,
         CancellationToken cancellationToken)
     {
-        var command = new GetDirectoriesQuery(
+        var command = new GetDirectoryQuery(
             userId,
             parentDirectoryId);
-        GetDirectoriesResult result = await sender.Send(command, cancellationToken);
+        GetDirectoryResult result = await sender.Send(command, cancellationToken);
         return TypedResults.Ok(
-            new GetDirectoriesResponse(
+            new GetDirectoryResponse(
                 result.ParentDirectory is not null ? 
-                    new GetDirectoriesResponse.DirectoryModel(
+                    new GetDirectoryResponse.DirectoryModel(
                         result.ParentDirectory.Id,
                         result.ParentDirectory.Name,
                         result.ParentDirectory.Path,
                         result.ParentDirectory.ParentDirectoryId)
                     : null,
+                result.Files.Select(x =>
+                    new GetDirectoryResponse.FileModel(x.Id, x.Name))
+                    .ToArray(),
                 result.Directories.Select(x =>
-                        new GetDirectoriesResponse.DirectoryModel(
+                        new GetDirectoryResponse.DirectoryModel(
                             x.Id,
                             x.Name,
                             x.Path,

@@ -54,12 +54,12 @@ internal sealed class UpdateHandler(
     {
         logger.LogInformation("{UserId} Receive message type: {MessageType}", msg.Chat.Id, msg.Type);
         
-        if (msg.Text is not { } messageText)
+        if (msg.Text is null && msg.Document is null)
         {
             return;
         }
 
-        Message? sentMessage = await (messageText switch
+        Message? sentMessage = await (msg.Text switch
         {
             "/start" => AnswerToStartMessage(msg),
             Menu.Storage => HandleStorageTab(msg, cancellationToken),
@@ -95,8 +95,6 @@ internal sealed class UpdateHandler(
 
     private async Task<Message?> AnswerToUnknownMessage(Message msg, CancellationToken cancellationToken)
     {
-        const string answer = "Не понимаю о чём речь.";
-
         var userState = await dbContext.UserStates
             .Include(x => x.CurrentWorkflow)
             .FirstOrDefaultAsync(x => x.UserId == msg.Chat.Id.ToString(), cancellationToken);
@@ -110,7 +108,7 @@ internal sealed class UpdateHandler(
         {
             return await bot.SendTextMessageAsync(
                 msg.Chat,
-                answer,
+                "Не понимаю о чём речь.",
                 parseMode: ParseMode.Html,
                 cancellationToken: cancellationToken);
         }
@@ -128,15 +126,18 @@ internal sealed class UpdateHandler(
 
     private async Task<Message?> HandleStorageTab(Message message, CancellationToken cancellationToken)
     {
-        var getDirectoriesResponse = await storageApi.GetDirectories(
+        var getDirectoryResponse = await storageApi.GetDirectories(
             message.Chat.Id.ToString(),
             null,
             cancellationToken);
         
         DirectoryKeyboardPresenter.Result result = directoryKeyboardPresenter.OpenRootDirectory(
-            getDirectoriesResponse.SubDirectories
+            getDirectoryResponse.SubDirectories
                 .Select(x => new DirectoryKeyboardPresenter.DirectoryButton(x.Id, x.Name))
                 .ToArray(), 
+            getDirectoryResponse.Files
+                .Select(x => new DirectoryKeyboardPresenter.FileButton(x.Id, x.Name))
+                .ToArray(),
             message.Chat.Id.ToString());
         
         await dbContext.UserCallbacks.AddRangeAsync(result.UserCallbacks, cancellationToken);

@@ -32,7 +32,7 @@ public sealed class RemoveDirectoryCallback : ICallback
             "Папка удалена",
             cancellationToken: cancellationToken);
         
-        var getDirectoriesResponse = await storageApi.GetDirectories(
+        var getDirectoryResponse = await storageApi.GetDirectories(
             userId,
             removeDirectoryResponse.ParentRemovedDirectoryId,
             cancellationToken);
@@ -42,20 +42,26 @@ public sealed class RemoveDirectoryCallback : ICallback
         if (removeDirectoryResponse.ParentRemovedDirectoryId is null)
         {
             keyboardPresentResult = directoryKeyboardPresenter.OpenRootDirectory(
-                getDirectoriesResponse.SubDirectories
+                getDirectoryResponse.SubDirectories
                     .Select(x => new DirectoryKeyboardPresenter.DirectoryButton(x.Id, x.Name))
                     .ToArray(), 
+                getDirectoryResponse.Files
+                    .Select(x => new DirectoryKeyboardPresenter.FileButton(x.Id, x.Name))
+                    .ToArray(),
                 userId);
         }
         else
         {
             keyboardPresentResult = directoryKeyboardPresenter.OpenDirectory(
-                getDirectoriesResponse.SubDirectories
+                getDirectoryResponse.SubDirectories
                     .Select(x => new DirectoryKeyboardPresenter.DirectoryButton(x.Id, x.Name))
                     .ToArray(), 
+                getDirectoryResponse.Files
+                    .Select(x => new DirectoryKeyboardPresenter.FileButton(x.Id, x.Name))
+                    .ToArray(),
                 userId,
                 removeDirectoryResponse.ParentRemovedDirectoryId.Value,
-                getDirectoriesResponse.Directory?.ParentDirectoryId);
+                getDirectoryResponse.Directory?.ParentDirectoryId);
         }
         
         await dbContext.UserCallbacks.AddRangeAsync(keyboardPresentResult.UserCallbacks, cancellationToken);
@@ -63,7 +69,7 @@ public sealed class RemoveDirectoryCallback : ICallback
                 
         await bot.SendTextMessageAsync(
             userId, 
-            getDirectoriesResponse.Directory?.Path ?? "Корневая папка вашего хранилища",
+            getDirectoryResponse.Directory?.Path ?? "Корневая папка вашего хранилища",
             replyMarkup: keyboardPresentResult.Keyboard,
             cancellationToken: cancellationToken);
     }

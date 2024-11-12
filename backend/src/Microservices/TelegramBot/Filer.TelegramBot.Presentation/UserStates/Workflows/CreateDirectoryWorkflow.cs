@@ -60,25 +60,28 @@ public sealed class CreateDirectoryWorkflow : IWorkflow
                     "Папка создана",
                     cancellationToken: cancellationToken);
                 
-                var getDirectoriesResponse = await storageApi.GetDirectories(
+                var getDirectoryResponse = await storageApi.GetDirectories(
                     userId,
                     createDirectoryResponse.DirectoryId,
                     cancellationToken);
 
                 DirectoryKeyboardPresenter.Result keyboardPresentResult = directoryKeyboardPresenter.OpenDirectory(
-                    getDirectoriesResponse.SubDirectories
+                    getDirectoryResponse.SubDirectories
                         .Select(x => new DirectoryKeyboardPresenter.DirectoryButton(x.Id, x.Name))
                         .ToArray(), 
+                    getDirectoryResponse.Files
+                        .Select(x => new DirectoryKeyboardPresenter.FileButton(x.Id, x.Name))
+                        .ToArray(),
                     userId,
                     createDirectoryResponse.DirectoryId,
-                    getDirectoriesResponse.Directory?.ParentDirectoryId);
+                    getDirectoryResponse.Directory?.ParentDirectoryId);
         
                 await dbContext.UserCallbacks.AddRangeAsync(keyboardPresentResult.UserCallbacks, cancellationToken);
                 await dbContext.SaveChangesAsync(cancellationToken);
                 
                 await bot.SendTextMessageAsync(
                     userId, 
-                    getDirectoriesResponse.Directory?.Path ?? "Корневая папка вашего хранилища",
+                    getDirectoryResponse.Directory?.Path ?? "Корневая папка вашего хранилища",
                     replyMarkup: keyboardPresentResult.Keyboard,
                     cancellationToken: cancellationToken);
 

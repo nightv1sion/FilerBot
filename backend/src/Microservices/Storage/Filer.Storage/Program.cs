@@ -2,6 +2,7 @@ using System.Reflection;
 using Filer.Common.Infrastructure.Persistence.Extensions;
 using Filer.Common.Presentation.Endpoints;
 using Filer.Storage;
+using Filer.Storage.Shared.FileStorage;
 using Filer.Storage.Shared.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,7 @@ builder.Services.AddSwaggerGen();
 builder.Services
     .RegisterApplicationServices()
     .RegisterPersistence(builder.Configuration)
+    .RegisterFileStorage(builder.Configuration)
     .AddEndpoints(Assembly.GetExecutingAssembly());
 
 var app = builder.Build();

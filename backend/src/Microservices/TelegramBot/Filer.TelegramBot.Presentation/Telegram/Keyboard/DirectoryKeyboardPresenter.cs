@@ -9,46 +9,78 @@ internal sealed class DirectoryKeyboardPresenter(
 {
     public Result OpenRootDirectory(
         IReadOnlyCollection<DirectoryButton> buttons,
+        IReadOnlyCollection<FileButton> files,
         string userId)
     {
         var keyboard = new InlineKeyboardMarkup();
 
-        var openCallbacks = AddOpenButtons(
+        var openCallbacks = AddOpenDirectoriesButtons(
             keyboard,
             buttons,
             userId);
         
         keyboard.AddNewRow();
+        
+        var openFilesCallbacks = AddOpenFilesButtons(
+            keyboard,
+            userId,
+            files);
+        
+        keyboard.AddNewRow();
 
-        var createCallback = AddCreateButton(
+        var createCallback = AddCreateDirectoryButton(
+            keyboard,
+            userId,
+            null);
+        
+        var uploadFileCallback = AddUploadFileButton(
             keyboard,
             userId,
             null);
 
-        return new Result(keyboard, [..openCallbacks, createCallback]);
+        return new Result(keyboard, [
+            ..openCallbacks,
+            ..openFilesCallbacks,
+            createCallback,
+            uploadFileCallback]);
     }
 
     public Result OpenDirectory(
         IReadOnlyCollection<DirectoryButton> buttons,
+        IReadOnlyCollection<FileButton> files,
         string userId,
         Guid directoryId,
         Guid? parentDirectoryId)
     {
         var keyboard = new InlineKeyboardMarkup();
 
-        var openCallbacks = AddOpenButtons(
+        var openDirectoriesCallbacks = AddOpenDirectoriesButtons(
             keyboard,
             buttons,
             userId);
         
         keyboard.AddNewRow();
+        
+        var openFilesCallbacks = AddOpenFilesButtons(
+            keyboard,
+            userId,
+            files);
+        
+        keyboard.AddNewRow();
 
-        var createCallback = AddCreateButton(
+        var createCallback = AddCreateDirectoryButton(
             keyboard,
             userId,
             directoryId);
         
-        var removeDirectoryCallback = AddRemoveButton(
+        var removeDirectoryCallback = AddRemoveDirectoryButton(
+            keyboard,
+            userId,
+            directoryId);
+        
+        keyboard.AddNewRow();
+        
+        var uploadFileCallback = AddUploadFileButton(
             keyboard,
             userId,
             directoryId);
@@ -60,13 +92,15 @@ internal sealed class DirectoryKeyboardPresenter(
         
         return new Result(
             keyboard, [
-                ..openCallbacks,
+                ..openDirectoriesCallbacks,
+                ..openFilesCallbacks,
                 createCallback,
                 removeDirectoryCallback,
+                uploadFileCallback,
                 backDirectoryCallback]);
     }
 
-    private IReadOnlyCollection<UserCallback> AddOpenButtons(
+    private IReadOnlyCollection<UserCallback> AddOpenDirectoriesButtons(
         InlineKeyboardMarkup keyboard,
         IReadOnlyCollection<DirectoryButton> buttons,
         string userId)
@@ -82,13 +116,13 @@ internal sealed class DirectoryKeyboardPresenter(
             userCallbacks.Add(openDirectoryCallback);
             
             keyboard.AddNewRow();
-            keyboard.AddFolderButton(button.Name, openDirectoryCallback.Id.ToString());
+            keyboard.AddOpenFolderButton(button.Name, openDirectoryCallback.Id.ToString());
         }
 
         return userCallbacks;
     }
 
-    private UserCallback AddCreateButton(
+    private UserCallback AddCreateDirectoryButton(
         InlineKeyboardMarkup keyboard,
         string userId,
         Guid? directoryId)
@@ -101,7 +135,7 @@ internal sealed class DirectoryKeyboardPresenter(
         return createDirectoryCallback;
     }
     
-    private UserCallback AddRemoveButton(
+    private UserCallback AddRemoveDirectoryButton(
         InlineKeyboardMarkup keyboard,
         string userId,
         Guid directoryId)
@@ -126,8 +160,47 @@ internal sealed class DirectoryKeyboardPresenter(
         keyboard.AddBackFolderButton(backButton.Id.ToString());
         return backButton;
     }
+
+    private UserCallback AddUploadFileButton(
+        InlineKeyboardMarkup keyboard,
+        string userId,
+        Guid? directoryId)
+    {
+        var uploadFileCallback = UserCallback.Create(
+            Guid.NewGuid(), 
+            userId, 
+            callbackSerializer.Serialize(UploadFileCallback.Create(directoryId)));
+        keyboard.AddUploadFileButton(uploadFileCallback.Id.ToString());
+        return uploadFileCallback;
+    }
+    
+    private IReadOnlyCollection<UserCallback> AddOpenFilesButtons(
+        InlineKeyboardMarkup keyboard,
+        string userId,
+        IReadOnlyCollection<FileButton> buttons)
+    {
+        List<UserCallback> userCallbacks = new(buttons.Count);
+
+        foreach (var button in buttons)
+        {
+            var openFileCallback = UserCallback.Create(
+                Guid.NewGuid(), 
+                userId, 
+                callbackSerializer.Serialize(OpenFileCallback.Create(button.Id)));
+            userCallbacks.Add(openFileCallback);
+            
+            keyboard.AddNewRow();
+            keyboard.AddOpenFileButton(button.Name, openFileCallback.Id.ToString());
+        }
+
+        return userCallbacks;
+    }
     
     public sealed record DirectoryButton(
+        Guid Id,
+        string Name);
+    
+    public sealed record FileButton(
         Guid Id,
         string Name);
 

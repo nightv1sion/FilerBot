@@ -5,14 +5,11 @@ using Telegram.Bot.Types;
 
 namespace Filer.TelegramBot.Presentation.UserStates.Callbacks;
 
-public sealed class CreateDirectoryCallback : ICallback
+public sealed class UploadFileCallback : ICallback
 {
     public Guid? ParentDirectoryId { get; init; }
-    
-    public async Task Handle(
-        IServiceProvider serviceProvider,
-        CallbackQuery callbackQuery,
-        CancellationToken cancellationToken)
+
+    public async Task Handle(IServiceProvider serviceProvider, CallbackQuery callbackQuery, CancellationToken cancellationToken)
     {
         var dbContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
         var workflowSerializer = serviceProvider.GetRequiredService<WorkflowSerializer>();
@@ -27,7 +24,7 @@ public sealed class CreateDirectoryCallback : ICallback
             throw new InvalidOperationException($"User {callbackQuery.From.Id} state not found");
         }
 
-        var workflow = CreateDirectoryWorkflow.Create(ParentDirectoryId);
+        var workflow = UploadFileWorkflow.Create(ParentDirectoryId);
 
         await workflow.Start(
             serviceProvider,
@@ -43,10 +40,10 @@ public sealed class CreateDirectoryCallback : ICallback
         await dbContext.UserWorkflows.AddAsync(userWorkflow, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
     }
-
-    public static CreateDirectoryCallback Create(Guid? parentDirectoryId)
+    
+    public static UploadFileCallback Create(Guid? parentDirectoryId)
     {
-        return new CreateDirectoryCallback
+        return new UploadFileCallback
         {
             ParentDirectoryId = parentDirectoryId
         };

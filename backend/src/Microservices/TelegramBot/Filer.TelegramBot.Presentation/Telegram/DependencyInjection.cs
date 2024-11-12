@@ -29,6 +29,7 @@ public static class DependencyInjection
         services.AddHostedService<PollingService>();
         services.AddScoped<IMessageSender, MessageSender>();
         services.AddScoped<DirectoryKeyboardPresenter>();
+        services.AddScoped<FileKeyboardPresenter>();
         
         return services;
     }

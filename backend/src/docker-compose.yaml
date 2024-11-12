@@ -8,11 +8,11 @@ services:
       - "7000:8080"
     environment:
       TelegramIntegration__BotConfiguration__BotToken: $TELEGRAM_BOT_TOKEN
-      Integration__Storage__Uri: $STORAGE_URI
-      ConnectionStrings__Database: $TELEGRAM_BOT_POSTGRES_CONNECTION_STRING
+      Integration__Storage__Uri: http://filer.storage:8080
+      ConnectionStrings__Database: Host=filer.postgres;Port=5432;Database=filer.telegram-bot;Username=postgres;Password=postgres;
     labels:
       com.jetbrains.rider.debug: "true"
-      
+
   filer.storage:
     container_name: Filer.Storage
     build:
@@ -21,7 +21,10 @@ services:
     ports:
       - "7100:8080"
     environment:
-      ConnectionStrings__Database: $STORAGE_POSTGRES_CONNECTION_STRING
+      ConnectionStrings__Database: Host=filer.postgres;Port=5432;Database=filer.storage;Username=postgres;Password=postgres;
+      Minio__Endpoint: filer.minio:9000
+      Minio__AccessKey: minio
+      Minio__SecretKey: minio123
     labels:
       com.jetbrains.rider.debug: "true"
 
@@ -37,7 +40,7 @@ services:
       - 9090:9090
     volumes:
       - minio-data:/data
-  
+
   filer.postgres:
     image: postgres:17
     container_name: Filer.Postgres

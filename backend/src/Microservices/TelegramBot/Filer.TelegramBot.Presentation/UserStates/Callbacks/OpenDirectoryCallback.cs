@@ -22,7 +22,7 @@ public sealed class OpenDirectoryCallback : ICallback
         var dbContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
         var directoryKeyboardPresenter = serviceProvider.GetRequiredService<DirectoryKeyboardPresenter>();
         
-        var getDirectoriesResponse = await storageApi.GetDirectories(
+        var getDirectoryResponse = await storageApi.GetDirectories(
             callbackQuery.From.Id.ToString(),
             DirectoryId,
             cancellationToken);
@@ -32,20 +32,26 @@ public sealed class OpenDirectoryCallback : ICallback
         if (DirectoryId is null)
         {
             keyboardPresentResult = directoryKeyboardPresenter.OpenRootDirectory(
-                getDirectoriesResponse.SubDirectories
+                getDirectoryResponse.SubDirectories
                     .Select(x => new DirectoryKeyboardPresenter.DirectoryButton(x.Id, x.Name))
                     .ToArray(), 
+                getDirectoryResponse.Files
+                    .Select(x => new DirectoryKeyboardPresenter.FileButton(x.Id, x.Name))
+                    .ToArray(),
                 callbackQuery.From.Id.ToString());
         }
         else
         {
             keyboardPresentResult = directoryKeyboardPresenter.OpenDirectory(
-                getDirectoriesResponse.SubDirectories
+                getDirectoryResponse.SubDirectories
                     .Select(x => new DirectoryKeyboardPresenter.DirectoryButton(x.Id, x.Name))
                     .ToArray(), 
+                getDirectoryResponse.Files
+                    .Select(x => new DirectoryKeyboardPresenter.FileButton(x.Id, x.Name))
+                    .ToArray(),
                 callbackQuery.From.Id.ToString(),
                 DirectoryId.Value,
-                getDirectoriesResponse.Directory?.ParentDirectoryId);
+                getDirectoryResponse.Directory?.ParentDirectoryId);
         }
         
         await dbContext.UserCallbacks.AddRangeAsync(keyboardPresentResult.UserCallbacks, cancellationToken);
@@ -53,7 +59,7 @@ public sealed class OpenDirectoryCallback : ICallback
 
         await bot.SendTextMessageAsync(
             callbackQuery.From.Id, 
-            getDirectoriesResponse.Directory?.Path ?? "Корневая папка вашего хранилища",
+            getDirectoryResponse.Directory?.Path ?? "Корневая папка вашего хранилища",
             replyMarkup: keyboardPresentResult.Keyboard,
             cancellationToken: cancellationToken);
     }
