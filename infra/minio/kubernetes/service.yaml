@@ -9,8 +9,11 @@ spec:
   type: NodePort
   ports:
     - protocol: TCP
-      port: 90
+      port: 9090
       targetPort: 9090
       nodePort: 30001
+    - protocol: TCP
+      port: 9000
+      targetPort: 9000
   selector:
     app: minio
