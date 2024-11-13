@@ -37,7 +37,7 @@ public sealed class OpenFileCallback : ICallback
 
         await bot.SendTextMessageAsync(
             callbackQuery.From.Id, 
-            getFileResponse.Path,
+            $"\ud83d\udcc4 {getFileResponse.Path}",
             replyMarkup: keyboardPresentResult.Keyboard,
             cancellationToken: cancellationToken);
     }

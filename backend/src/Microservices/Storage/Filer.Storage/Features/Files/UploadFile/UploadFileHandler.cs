@@ -13,29 +13,45 @@ internal sealed class UploadFileHandler(
 {
     public async Task<Guid> Handle(UploadFileCommand request, CancellationToken cancellationToken)
     {
-        var directory = await dbContext.Directories
-            .Where(x => x.UserId == request.UserId)
-            .FirstOrDefaultAsync(x => x.Id == request.ParentDirectoryId, cancellationToken);
-
-        if (directory is null)
+        string filePath;
+        
+        if (request.ParentDirectoryId is not null)
         {
-            throw new InvalidOperationException($"Directory {request.ParentDirectoryId} not found");
+            var directory = await dbContext.Directories
+                .Where(x => x.UserId == request.UserId)
+                .FirstOrDefaultAsync(x => x.Id == request.ParentDirectoryId, cancellationToken);
+
+            if (directory is null)
+            {
+                throw new InvalidOperationException($"Directory {request.ParentDirectoryId} not found");
+            }
+            
+            filePath = $"{directory.Path}/{request.FileName}";
+        }
+        else
+        {
+            filePath = request.FileName;
         }
         
         FileObject file = new()
         {
             Id = Guid.NewGuid(),
             Name = request.FileName,
-            Path = $"{directory.Path}/{request.FileName}",
+            Path = filePath,
             Extension = Path.GetExtension(request.FileName).ToLower(),
             Size = request.FileBytes.Length,
             UserId = request.UserId,
             ParentDirectoryId = request.ParentDirectoryId,
-            Created = DateTimeOffset.Now,
+            Created = DateTimeOffset.UtcNow,
             Modified = null
         };
         
         MemoryStream stream = new(request.FileBytes);
+
+        await minioClient.MakeBucketAsync(
+            new MakeBucketArgs()
+                .WithBucket(request.UserId),
+            cancellationToken);
 
         PutObjectArgs args = new PutObjectArgs()
                 .WithBucket(request.UserId)

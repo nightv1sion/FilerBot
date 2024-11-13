@@ -71,7 +71,7 @@ public sealed class UploadFileWorkflow : IWorkflow
                     "Файл загружен",
                     cancellationToken: cancellationToken);
                 
-                var getDirectoryResponse = await storageApi.GetDirectories(
+                var getDirectoryResponse = await storageApi.GetDirectory(
                     userId,
                     DirectoryId,
                     cancellationToken);
@@ -108,7 +108,9 @@ public sealed class UploadFileWorkflow : IWorkflow
                 
                 await bot.SendTextMessageAsync(
                     userId, 
-                    getDirectoryResponse.Directory?.Path ?? "Корневая папка вашего хранилища",
+                    getDirectoryResponse.Directory?.Path is not null 
+                        ? $"\ud83d\uddc2 {getDirectoryResponse.Directory.Path}" 
+                        :  "Корневая папка вашего хранилища",
                     replyMarkup: keyboardPresentResult.Keyboard,
                     cancellationToken: cancellationToken);
 

@@ -22,7 +22,7 @@ public sealed class OpenDirectoryCallback : ICallback
         var dbContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
         var directoryKeyboardPresenter = serviceProvider.GetRequiredService<DirectoryKeyboardPresenter>();
         
-        var getDirectoryResponse = await storageApi.GetDirectories(
+        var getDirectoryResponse = await storageApi.GetDirectory(
             callbackQuery.From.Id.ToString(),
             DirectoryId,
             cancellationToken);
@@ -59,7 +59,9 @@ public sealed class OpenDirectoryCallback : ICallback
 
         await bot.SendTextMessageAsync(
             callbackQuery.From.Id, 
-            getDirectoryResponse.Directory?.Path ?? "Корневая папка вашего хранилища",
+            getDirectoryResponse.Directory?.Path is not null 
+                ? $"\ud83d\uddc2 {getDirectoryResponse.Directory.Path}" 
+                :  "Корневая папка вашего хранилища",
             replyMarkup: keyboardPresentResult.Keyboard,
             cancellationToken: cancellationToken);
     }

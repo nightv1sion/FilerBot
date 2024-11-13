@@ -12,19 +12,28 @@ public sealed class FileKeyboardPresenter(CallbackSerializer callbackSerializer)
     {
         var keyboard = new InlineKeyboardMarkup();
         
-        var backDirectoryCallback = AddBackButton(
-            keyboard,
-            userId,
-            file.ParentDirectoryId);
-        
         var downloadFileCallback = AddDownloadFileButton(
             keyboard,
             userId,
             file.Id);
         
+        var removeFileCallback = AddRemoveFileButton(
+            keyboard,
+            userId,
+            file.Id,
+            file.ParentDirectoryId);
+        
+        keyboard.AddNewRow();
+        
+        var backDirectoryCallback = AddBackButton(
+            keyboard,
+            userId,
+            file.ParentDirectoryId);
+        
         return new Result(keyboard, [
-            backDirectoryCallback,
-            downloadFileCallback]);
+            downloadFileCallback,
+            removeFileCallback,
+            backDirectoryCallback]);
     }
     
     private UserCallback AddDownloadFileButton(
@@ -51,6 +60,20 @@ public sealed class FileKeyboardPresenter(CallbackSerializer callbackSerializer)
             callbackSerializer.Serialize(OpenDirectoryCallback.Create(directoryId)));
         keyboard.AddBackFolderButton(backButton.Id.ToString());
         return backButton;
+    }
+    
+    private UserCallback AddRemoveFileButton(
+        InlineKeyboardMarkup keyboard,
+        string userId,
+        Guid fileId,
+        Guid? parentDirectoryId)
+    {
+        var removeFileCallback = UserCallback.Create(
+            Guid.NewGuid(), 
+            userId, 
+            callbackSerializer.Serialize(RemoveFileCallback.Create(fileId, parentDirectoryId)));
+        keyboard.AddDeleteFileButton(removeFileCallback.Id.ToString());
+        return removeFileCallback;
     }
     
     public sealed record FileInfo(

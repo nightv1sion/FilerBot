@@ -126,7 +126,7 @@ internal sealed class UpdateHandler(
 
     private async Task<Message?> HandleStorageTab(Message message, CancellationToken cancellationToken)
     {
-        var getDirectoryResponse = await storageApi.GetDirectories(
+        var getDirectoryResponse = await storageApi.GetDirectory(
             message.Chat.Id.ToString(),
             null,
             cancellationToken);

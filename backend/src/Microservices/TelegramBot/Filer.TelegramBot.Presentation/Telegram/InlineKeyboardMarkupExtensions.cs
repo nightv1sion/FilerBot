@@ -9,7 +9,7 @@ public static class InlineKeyboardMarkupExtensions
         string name,
         string callbackData)
     {
-        return keyboard.AddButton($"\ud83d\udcc1 {name}", callbackData);
+        return keyboard.AddButton($"\ud83d\uddc2 {name}", callbackData);
     }
 
     public static InlineKeyboardMarkup AddCreateFolderButton(
@@ -37,14 +37,14 @@ public static class InlineKeyboardMarkupExtensions
         this InlineKeyboardMarkup keyboard,
         string callbackData)
     {
-        return keyboard.AddButton("\ud83d\uddce Загрузить файл", callbackData);
+        return keyboard.AddButton("\u2b06\ufe0f Загрузить файл", callbackData);
     }
     
     public static InlineKeyboardMarkup AddDownloadFileButton(
         this InlineKeyboardMarkup keyboard,
         string callbackData)
     {
-        return keyboard.AddButton("\ud83d\udd3c Скачать файл", callbackData);
+        return keyboard.AddButton("\u2b07\ufe0f Скачать файл", callbackData);
     }
     
     public static InlineKeyboardMarkup AddOpenFileButton(
@@ -52,6 +52,13 @@ public static class InlineKeyboardMarkupExtensions
         string name,
         string callbackData)
     {
-        return keyboard.AddButton($"\ud83d\uddce {name}", callbackData);
+        return keyboard.AddButton($"\ud83d\udcc4 {name}", callbackData);
+    }
+    
+    public static InlineKeyboardMarkup AddDeleteFileButton(
+        this InlineKeyboardMarkup keyboard,
+        string callbackData)
+    {
+        return keyboard.AddButton("\u2796 Удалить файл", callbackData);
     }
 }

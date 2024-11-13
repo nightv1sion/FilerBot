@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
         services.AddMinio(configureClient =>
             configureClient.WithEndpoint(configuration["Minio:Endpoint"])
                 .WithCredentials(configuration["Minio:AccessKey"], configuration["Minio:SecretKey"])
+                .WithSSL(false)
                 .Build());
 
         return services;

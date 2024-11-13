@@ -8,7 +8,7 @@ services:
       - "7000:8080"
     environment:
       TelegramIntegration__BotConfiguration__BotToken: $TELEGRAM_BOT_TOKEN
-      Integration__Storage__Uri: http://filer.storage:8080
+      Integration__Storage__Uri: http://host.docker.internal:7100
       ConnectionStrings__Database: Host=filer.postgres;Port=5432;Database=filer.telegram-bot;Username=postgres;Password=postgres;
     labels:
       com.jetbrains.rider.debug: "true"

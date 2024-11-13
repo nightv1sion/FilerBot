@@ -60,7 +60,7 @@ public sealed class CreateDirectoryWorkflow : IWorkflow
                     "Папка создана",
                     cancellationToken: cancellationToken);
                 
-                var getDirectoryResponse = await storageApi.GetDirectories(
+                var getDirectoryResponse = await storageApi.GetDirectory(
                     userId,
                     createDirectoryResponse.DirectoryId,
                     cancellationToken);
@@ -81,7 +81,9 @@ public sealed class CreateDirectoryWorkflow : IWorkflow
                 
                 await bot.SendTextMessageAsync(
                     userId, 
-                    getDirectoryResponse.Directory?.Path ?? "Корневая папка вашего хранилища",
+                    getDirectoryResponse.Directory?.Path is not null 
+                        ? $"\ud83d\uddc2 {getDirectoryResponse.Directory.Path}" 
+                        :  "Корневая папка вашего хранилища",
                     replyMarkup: keyboardPresentResult.Keyboard,
                     cancellationToken: cancellationToken);
 

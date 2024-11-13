@@ -57,6 +57,7 @@ public sealed class FileConfiguration : IEntityTypeConfiguration<FileObject>
             .HasOne(x => x.ParentDirectory)
             .WithMany(x => x.Files)
             .HasForeignKey(x => x.ParentDirectoryId)
+            .OnDelete(DeleteBehavior.Cascade)
             .IsRequired(false);
     }
 }

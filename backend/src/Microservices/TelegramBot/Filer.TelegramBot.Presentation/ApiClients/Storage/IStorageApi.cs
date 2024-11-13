@@ -2,6 +2,8 @@ using Filer.Storage.Integration.Directories.CreateDirectory;
 using Filer.Storage.Integration.Directories.GetDirectories;
 using Filer.Storage.Integration.Directories.GetFile;
 using Filer.Storage.Integration.Directories.RemoveDirectory;
+using Filer.Storage.Integration.Files.DownloadFile;
+using Filer.Storage.Integration.Files.RemoveFile;
 using Filer.Storage.Integration.Files.UploadFIle;
 using Refit;
 
@@ -10,7 +12,7 @@ namespace Filer.TelegramBot.Presentation.ApiClients.Storage;
 public interface IStorageApi
 {
     [Get("/directories")]
-    Task<GetDirectoryResponse> GetDirectories(
+    Task<GetDirectoryResponse> GetDirectory(
         [Query] string userId,
         [Query] Guid? parentDirectoryId,
         CancellationToken cancellationToken);
@@ -34,5 +36,15 @@ public interface IStorageApi
     [Post("/files")]
     Task<UploadFileResponse> UploadFile(
         [Body] UploadFileRequest request,
+        CancellationToken cancellationToken);
+    
+    [Post("/files/download")]
+    Task<DownloadFileResponse?> DownloadFile(
+        [Body] DownloadFileRequest request,
+        CancellationToken cancellationToken);
+    
+    [Delete("/files")]
+    Task RemoveFile(
+        [Body] RemoveFileRequest request,
         CancellationToken cancellationToken);
 }
