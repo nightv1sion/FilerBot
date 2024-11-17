@@ -3,6 +3,7 @@ using Filer.TelegramBot.Presentation.Persistence;
 using Filer.TelegramBot.Presentation.Telegram.Keyboard;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace Filer.TelegramBot.Presentation.UserStates.Callbacks;
 
@@ -36,8 +37,11 @@ public sealed class OpenFileCallback : ICallback
         await dbContext.SaveChangesAsync(cancellationToken);
 
         await bot.SendTextMessageAsync(
-            callbackQuery.From.Id, 
-            $"\ud83d\udcc4 {getFileResponse.Path}",
+            callbackQuery.From.Id,
+            $"\ud83d\udcc4 <b>{getFileResponse.Name}</b>\n" +
+            $"Расположение: {getFileResponse.Path}\n" +
+            $"Размер: {getFileResponse.Size} байт",
+            parseMode: ParseMode.Html,
             replyMarkup: keyboardPresentResult.Keyboard,
             cancellationToken: cancellationToken);
     }

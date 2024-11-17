@@ -21,9 +21,10 @@ public sealed class GetFileEndpoint : IEndpoint
         [FromServices] ISender sender,
         CancellationToken cancellationToken)
     {
-        var command = new GetFileQuery(
+        GetFileQuery command = new(
             userId,
             fileId);
+        
         GetFileResult? result = await sender.Send(command, cancellationToken);
         
         if (result is null)
@@ -36,6 +37,7 @@ public sealed class GetFileEndpoint : IEndpoint
                 result.Id,
                 result.Name,
                 result.Path,
+                result.Size,
                 result.ParentDirectoryId));
     }
 }

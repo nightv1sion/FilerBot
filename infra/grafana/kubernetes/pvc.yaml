@@ -4,6 +4,7 @@ metadata:
   name: grafana-persistent-volume-claim
   namespace: filer
 spec:
+  storageClassName: manual
   accessModes:
     - ReadWriteOnce
   resources:

@@ -4,4 +4,5 @@ public sealed record GetFileResult(
     Guid Id,
     string Name,
     string Path,
+    long Size,
     Guid? ParentDirectoryId);

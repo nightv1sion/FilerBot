@@ -26,6 +26,7 @@ internal sealed class GetFileHandler(
             file.Id,
             file.Name,
             file.Path,
+            file.Size,
             file.ParentDirectoryId);
     }
 }
