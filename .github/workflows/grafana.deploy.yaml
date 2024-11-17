@@ -40,7 +40,9 @@ jobs:
           proxy_password: ${{ secrets.PROXY_SSH_PASSWORD }}
           proxy_port: ${{ secrets.PROXY_SSH_PORT }}
           script: |
-            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/grafana/pvc.yaml
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/grafana/persistentVolume.yaml
+
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/grafana/persistentVolumeClaim.yaml
 
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/grafana/deployment.yaml
 
