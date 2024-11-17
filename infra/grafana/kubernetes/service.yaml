@@ -8,9 +8,10 @@ metadata:
 spec:
   ports:
     - name: web
-      port: 30003
+      port: 3000
       protocol: TCP
       targetPort: 3000
+      nodePort: 30003
   sessionAffinity: None
   type: NodePort
   selector:
