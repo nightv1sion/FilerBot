@@ -16,10 +16,9 @@ spec:
         app: minio
     spec:
       volumes:
-        - name: storage
-          hostPath: # MinIO generally recommends using locally-attached volumes
-            path: /mnt/disk1/data # Specify a path to a local drive or volume on the Kubernetes worker node
-            type: DirectoryOrCreate # The path to the last directory must exist
+        - name: minio-persistent-volume-storage
+          persistentVolumeClaim:
+            claimName: minio-persistent-volume-claim
       containers:
         - name: minio
           image: quay.io/minio/minio:latest
@@ -30,7 +29,7 @@ spec:
           args:
             - minio server /minio-data --console-address :9090
           volumeMounts:
-            - name: storage
+            - name: minio-persistent-volume-storage
               mountPath: "/storage"
           ports:
             - containerPort: 9000
