@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: storage
+  name: storage-configmap
   namespace: filer
 data:
   Jaeger__Endpoint: http://jaeger-collector.observability:4317

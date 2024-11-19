@@ -24,6 +24,8 @@ spec:
           envFrom:
             - secretRef:
                 name: telegram-bot-secrets
+            - configMapRef:
+                name: telegram-bot-configmap
           resources:
             requests:
               memory: 256Mi

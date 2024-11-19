@@ -24,6 +24,8 @@ spec:
           envFrom:
             - secretRef:
                 name: storage-secrets
+            - configMapRef:
+                name: storage-configmap
           resources:
             requests:
               memory: 256Mi
