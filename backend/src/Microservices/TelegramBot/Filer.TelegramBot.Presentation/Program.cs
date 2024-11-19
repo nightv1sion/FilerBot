@@ -1,11 +1,11 @@
+using System.Reflection;
 using Filer.Common.Infrastructure.Persistence.Extensions;
 using Filer.Common.Presentation.Endpoints;
 using Filer.Common.Presentation.Middlewares;
-using Filer.TelegramBot.Presentation;
+using Filer.Common.Presentation.OpenTelemetry;
 using Filer.TelegramBot.Presentation.ApiClients;
 using Filer.TelegramBot.Presentation.Persistence;
 using Filer.TelegramBot.Presentation.Telegram;
-using Filer.TelegramBot.Presentation.UserStates;
 using Filer.TelegramBot.Presentation.UserStates.Callbacks;
 using Filer.TelegramBot.Presentation.UserStates.Workflows;
 using Serilog;
@@ -22,6 +22,10 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.CustomSchemaIds(t => t.FullName?.Replace("+", "."));
 });
+
+builder.Services.RegisterOpenTelemetry(
+    Assembly.GetExecutingAssembly().GetName().Name!,
+    builder.Configuration["Jaeger:Endpoint"]!);
 
 builder.Services.RegisterRefitClients(builder.Configuration);
 builder.Services.RegisterTelegramIntegration(builder.Configuration);

@@ -1,6 +1,7 @@
 using System.Reflection;
 using Filer.Common.Infrastructure.Persistence.Extensions;
 using Filer.Common.Presentation.Endpoints;
+using Filer.Common.Presentation.OpenTelemetry;
 using Filer.Storage;
 using Filer.Storage.Shared.FileStorage;
 using Filer.Storage.Shared.Persistence;
@@ -9,6 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.RegisterOpenTelemetry(
+    Assembly.GetExecutingAssembly().GetName().Name!,
+    builder.Configuration["Jaeger:Endpoint"]!);
 
 builder.Services
     .RegisterApplicationServices()

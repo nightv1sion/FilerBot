@@ -106,6 +106,8 @@ jobs:
           script: |
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/Storage/secret.yaml
 
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/Storage/configmap.yaml
+
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl apply -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/Storage/deployment.yaml
 
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S microk8s kubectl set image -f /home/${{ secrets.SSH_USERNAME }}/github/kubernetes/Storage/deployment.yaml storage=${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_REGISTRY_USERNAME }}/filer-storage:dev-${{ vars.DEV_MAJOR_VERSION }}.${{ vars.DEV_MINOR_VERSION }}.${{ vars.DEV_PATCH_VERSION }}

@@ -10,6 +10,7 @@ services:
       TelegramIntegration__BotConfiguration__BotToken: $TELEGRAM_BOT_TOKEN
       Integration__Storage__Uri: http://host.docker.internal:7100
       ConnectionStrings__Database: Host=filer.postgres;Port=5432;Database=filer.telegram-bot;Username=postgres;Password=postgres;
+      Jaeger__Endpoint: http://host.docker.internal:4317
     labels:
       com.jetbrains.rider.debug: "true"
 
@@ -25,6 +26,7 @@ services:
       Minio__Endpoint: filer.minio:9000
       Minio__AccessKey: minio
       Minio__SecretKey: minio123
+      Jaeger__Endpoint: http://host.docker.internal:4317
     labels:
       com.jetbrains.rider.debug: "true"
 
@@ -36,8 +38,8 @@ services:
       MINIO_ROOT_PASSWORD: minio123
     command: minio server /minio-data --console-address :9090
     ports:
-      - 9000:9000
-      - 9090:9090
+      - "9000:9000"
+      - "9090:9090"
     volumes:
       - minio-data:/data
 
@@ -51,7 +53,14 @@ services:
     volumes:
       - ./.containers/db:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - "5432:5432"
+  
+  filer.jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: Filer.Jaeger
+    ports:
+      - "4317:4317"
+      - "16686:16686"
 
 volumes:
   minio-data:
