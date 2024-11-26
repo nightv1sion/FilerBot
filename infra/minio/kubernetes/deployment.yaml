@@ -37,6 +37,8 @@ spec:
           envFrom:
             - secretRef:
                 name: minio-secrets
+            - configMapRef:
+                name: minio-configmap
           resources:
             requests:
               memory: 128Mi
