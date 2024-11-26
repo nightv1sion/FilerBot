@@ -4,4 +4,4 @@ metadata:
   name: minio-configmap
   namespace: filer
 data:
-  MINIO_BROWSER_REDIRECT_URL: http://grafana.filer:3000/minio/ui
+  MINIO_BROWSER_REDIRECT_URL: http://127.0.0.1:30001/minio/ui
