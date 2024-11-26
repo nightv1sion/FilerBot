@@ -3,5 +3,3 @@ kind: ConfigMap
 metadata:
   name: minio-configmap
   namespace: filer
-data:
-  MINIO_BROWSER_REDIRECT_URL: http://127.0.0.1:30001/minio/ui
