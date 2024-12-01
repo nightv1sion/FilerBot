@@ -8,9 +8,14 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - protocol: TCP
+    - name: web
+      protocol: TCP
       port: 80
       targetPort: 80
       nodePort: 30003
+    - name: service
+      protocol: TCP
+      port: 5341
+      targetPort: 5341
   selector:
     app: seq
