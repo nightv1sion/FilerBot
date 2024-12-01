@@ -24,7 +24,8 @@ spec:
           image: datalust/seq:2024.3
           imagePullPolicy: Always
           ports:
-            - containerPort: 5432
+            - containerPort: 5341
+            - containerPort: 80
           envFrom:
             - configMapRef:
                 name: seq-configmap

@@ -9,8 +9,8 @@ spec:
   type: NodePort
   ports:
     - protocol: TCP
-      port: 5432
-      targetPort: 5432
+      port: 80
+      targetPort: 80
       nodePort: 30003
   selector:
     app: seq

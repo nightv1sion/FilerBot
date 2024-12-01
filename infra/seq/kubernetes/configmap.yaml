@@ -4,4 +4,4 @@ metadata:
   name: seq-configmap
   namespace: filer
 data:
-  ACCEPT_EULA: Y
+  ACCEPT_EULA: "Y"
