@@ -29,7 +29,11 @@ internal sealed class UpdateHandler(
         public const string Storage = "Хранилище";
     }
     
-    public async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, HandleErrorSource source, CancellationToken cancellationToken)
+    public async Task HandleErrorAsync(
+        ITelegramBotClient botClient,
+        Exception exception,
+        HandleErrorSource source,
+        CancellationToken cancellationToken)
     {
         if (exception is RequestException)
         {
@@ -39,9 +43,13 @@ internal sealed class UpdateHandler(
         logger.LogError("{Source} RequestException: {Exception}", source, exception);
     }
 
-    public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    public async Task HandleUpdateAsync(
+        ITelegramBotClient botClient,
+        Update update,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        
         await (update switch
         {
             { Message: { } message }                        => OnMessage(message, cancellationToken),

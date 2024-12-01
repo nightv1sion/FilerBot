@@ -4,4 +4,5 @@ metadata:
   name: storage-configmap
   namespace: filer
 data:
-  Jaeger__Endpoint: http://jaeger-collector.observability:4317
+  Seq__Endpoint: http://seq.filer:5341/ingest/otlp/v1/traces
+  Serilog__WriteTo__1__Args__serverUrl: http://seq.filer:5341

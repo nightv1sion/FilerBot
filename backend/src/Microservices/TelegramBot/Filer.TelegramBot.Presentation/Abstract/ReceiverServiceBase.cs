@@ -24,14 +24,15 @@ public abstract class ReceiverServiceBase<TUpdateHandler> : IReceiverService
 
     public async Task ReceiveAsync(CancellationToken stoppingToken)
     {
-        var receiverOptions = new ReceiverOptions()
+        var receiverOptions = new ReceiverOptions
         {
             AllowedUpdates = [],
             DropPendingUpdates = true,
         };
 
-        User me = await _botClient.GetMeAsync(stoppingToken);
-        _logger.LogInformation("Start receiving updates for {BotName}", me.Username ?? "My Awesome Bot");
+        User botInfo = await _botClient.GetMeAsync(stoppingToken);
+        
+        _logger.LogInformation("Start receiving updates for {BotName}", botInfo.Username);
 
         await _botClient.ReceiveAsync(
             updateHandler: _updateHandler,

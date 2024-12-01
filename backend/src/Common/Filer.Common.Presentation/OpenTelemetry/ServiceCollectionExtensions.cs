@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
@@ -25,6 +26,7 @@ public static class ServiceCollectionExtensions
                 tracing.AddOtlpExporter(configure =>
                 {
                     configure.Endpoint = new Uri(endpoint);
+                    configure.Protocol = OtlpExportProtocol.HttpProtobuf;
                 });
             });
 

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seq
+  namespace: filer
+  labels:
+    app: seq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seq
+  template:
+    metadata:
+      labels:
+        app: seq
+    spec:
+      volumes:
+        - name: seq-persistent-volume-storage
+          persistentVolumeClaim:
+            claimName: seq-persistent-volume-claim
+      containers:
+        - name: seq
+          image: datalust/seq:2024.3
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: seq-configmap
+          volumeMounts:
+            - mountPath: /data
+              name: seq-persistent-volume-storage
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 100m
+            limits:
+              memory: 256Mi
+              cpu: 200m

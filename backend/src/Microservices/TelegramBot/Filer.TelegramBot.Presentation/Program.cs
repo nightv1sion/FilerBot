@@ -12,7 +12,8 @@ using Serilog;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
+builder.Host.UseSerilog((context, loggerConfig) =>
+    loggerConfig.ReadFrom.Configuration(context.Configuration));
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
@@ -25,7 +26,7 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.RegisterOpenTelemetry(
     Assembly.GetExecutingAssembly().GetName().Name!,
-    builder.Configuration["Jaeger:Endpoint"]!);
+    builder.Configuration["Seq:Endpoint"]!);
 
 builder.Services.RegisterRefitClients(builder.Configuration);
 builder.Services.RegisterTelegramIntegration(builder.Configuration);
